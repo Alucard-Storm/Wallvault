@@ -307,95 +307,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                       ),
                     ),
-                    const Divider(height: 1),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.palette, size: 20),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Theme Color',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 12,
-                            children: AppConstants.themePresetNames.map((colorName) {
-                              final isSelected = settings.themeColor == colorName;
-                              final colors = AppConstants.themePresets[colorName]!;
-                              
-                              return GestureDetector(
-                                onTap: () {
-                                  settings.setThemeColor(colorName);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Theme color changed to ${colorName.toUpperCase()}'),
-                                      duration: const Duration(seconds: 1),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: isSelected ? Colors.white : Colors.transparent,
-                                      width: 3,
-                                    ),
-                                    boxShadow: isSelected
-                                        ? [
-                                            BoxShadow(
-                                              color: colors['primary']!.withValues(alpha: 0.5),
-                                              blurRadius: 8,
-                                              spreadRadius: 2,
-                                            ),
-                                          ]
-                                        : null,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(9),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            color: colors['primary'],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            color: colors['accent'],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                    if (!settings.useSystemColors) ...[
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.palette, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Theme Color',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Selected: ${settings.themeColor.toUpperCase()}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[500],
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 12,
+                              runSpacing: 12,
+                              children: AppConstants.themePresetNames.map((colorName) {
+                                final isSelected = settings.themeColor == colorName;
+                                final colors = AppConstants.themePresets[colorName]!;
+                                
+                                return GestureDetector(
+                                  onTap: () {
+                                    settings.setThemeColor(colorName);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Theme color changed to ${colorName.toUpperCase()}'),
+                                        duration: const Duration(seconds: 1),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSelected ? Colors.white : Colors.transparent,
+                                        width: 3,
+                                      ),
+                                      boxShadow: isSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: colors['primary']!.withValues(alpha: 0.5),
+                                                blurRadius: 8,
+                                                spreadRadius: 2,
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(9),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              color: colors['primary'],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              color: colors['accent'],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Selected: ${settings.themeColor.toUpperCase()}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
