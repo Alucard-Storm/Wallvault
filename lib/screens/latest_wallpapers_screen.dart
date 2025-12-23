@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/wallpaper_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
@@ -62,11 +61,12 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
         currentSorting: _provider.sorting,
         currentOrder: _provider.order,
         onApply: (categories, purity, sorting, order) {
+          // Keep sorting as date_added (latest first), only update categories and purity
           _provider.updateFilters(
             categories: categories,
             purity: purity,
-            sorting: sorting,
-            order: order,
+            sorting: AppConstants.sortDateAdded,
+            order: AppConstants.orderDesc,
           );
         },
       ),

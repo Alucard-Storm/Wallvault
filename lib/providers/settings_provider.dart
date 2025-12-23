@@ -9,6 +9,7 @@ class SettingsProvider with ChangeNotifier {
   String _defaultSorting = AppConstants.sortDateAdded;
   bool _isDarkTheme = true;
   String _themeColor = 'indigo'; // Default theme color
+  bool _useSystemColors = true; // Use Material You colors when available
   bool _isLoaded = false;
   
   // Getters
@@ -18,6 +19,7 @@ class SettingsProvider with ChangeNotifier {
   String get defaultSorting => _defaultSorting;
   bool get isDarkTheme => _isDarkTheme;
   String get themeColor => _themeColor;
+  bool get useSystemColors => _useSystemColors;
   bool get isLoaded => _isLoaded;
   
   // Get current theme colors
@@ -37,6 +39,7 @@ class SettingsProvider with ChangeNotifier {
       _defaultSorting = prefs.getString('defaultSorting') ?? AppConstants.sortDateAdded;
       _isDarkTheme = prefs.getBool('isDarkTheme') ?? true;
       _themeColor = prefs.getString('themeColor') ?? 'indigo';
+      _useSystemColors = prefs.getBool('useSystemColors') ?? true;
       
       _isLoaded = true;
       notifyListeners();
@@ -99,6 +102,14 @@ class SettingsProvider with ChangeNotifier {
     }
   }
   
+  // Toggle use system colors
+  Future<void> toggleUseSystemColors() async {
+    _useSystemColors = !_useSystemColors;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('useSystemColors', _useSystemColors);
+    notifyListeners();
+  }
+  
   // Clear cache
   Future<void> clearCache() async {
     // This would clear image cache
@@ -122,6 +133,7 @@ class SettingsProvider with ChangeNotifier {
     await prefs.remove('defaultSorting');
     await prefs.remove('isDarkTheme');
     await prefs.remove('themeColor');
+    await prefs.remove('useSystemColors');
     
     notifyListeners();
   }

@@ -282,6 +282,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.auto_awesome),
+                      title: const Text('Use System Colors'),
+                      subtitle: const Text('Material You dynamic colors (Android 12+)'),
+                      trailing: Switch(
+                        value: settings.useSystemColors,
+                        onChanged: (value) {
+                          settings.toggleUseSystemColors();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                value 
+                                    ? 'Using system colors (Material You)' 
+                                    : 'Using preset theme colors',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const Divider(height: 1),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/downloads_provider.dart';
 import '../utils/download_manager.dart';
+import 'downloaded_wallpaper_viewer.dart';
 
 class DownloadsScreen extends StatelessWidget {
   const DownloadsScreen({super.key});
@@ -104,100 +105,112 @@ class DownloadsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final download = provider.downloads[index];
               
-              return AspectRatio(
-                aspectRatio: 3 / 4, // Default aspect ratio for downloads
-                child: FutureBuilder<bool>(
-                  future: DownloadManager.fileExists(download.filePath),
-                  builder: (context, snapshot) {
-                    final fileExists = snapshot.data ?? false;
-                    
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DownloadedWallpaperViewer(
+                        downloadInfo: download,
                       ),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Display image from file if it exists
-                          if (fileExists)
-                            Image.file(
-                              File(download.filePath),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[900],
-                                  child: const Icon(
-                                    Icons.broken_image,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              },
-                            )
-                          else
-                            Container(
-                              color: Colors.grey[900],
-                              child: const Icon(
-                                Icons.image_not_supported,
-                                color: Colors.grey,
+                    ),
+                  );
+                },
+                child: AspectRatio(
+                  aspectRatio: 3 / 4, // Default aspect ratio for downloads
+                  child: FutureBuilder<bool>(
+                    future: DownloadManager.fileExists(download.filePath),
+                    builder: (context, snapshot) {
+                      final fileExists = snapshot.data ?? false;
+                      
+                      return Card(
+                        clipBehavior: Clip.antiAlias,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            // Display image from file if it exists
+                            if (fileExists)
+                              Image.file(
+                                File(download.filePath),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[900],
+                                    child: const Icon(
+                                      Icons.broken_image,
+                                      color: Colors.red,
+                                    ),
+                                  );
+                                },
+                              )
+                            else
+                              Container(
+                                color: Colors.grey[900],
+                                child: const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                          
-                          // Gradient overlay
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: [
-                                    Colors.black.withValues(alpha: 0.7),
-                                    Colors.transparent,
+                            
+                            // Gradient overlay
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.7),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Resolution badge
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        download.resolution,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    
+                                    // Download icon
+                                    const Icon(
+                                      Icons.download_done,
+                                      color: Colors.green,
+                                      size: 20,
+                                    ),
                                   ],
                                 ),
                               ),
-                              padding: const EdgeInsets.all(8),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Resolution badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.6),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      download.resolution,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  
-                                  // Download icon
-                                  const Icon(
-                                    Icons.download_done,
-                                    color: Colors.green,
-                                    size: 20,
-                                  ),
-                                ],
-                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               );
             },

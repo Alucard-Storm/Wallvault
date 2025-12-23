@@ -6,31 +6,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class DownloadManager {
-  // Request storage permission
+  // Request storage permission (Android 12+ uses READ_MEDIA_IMAGES)
   static Future<bool> requestPermission() async {
     if (Platform.isAndroid) {
-      final androidInfo = await _getAndroidVersion();
-      
-      if (androidInfo >= 33) {
-        // Android 13+ uses READ_MEDIA_IMAGES
-        final status = await Permission.photos.request();
-        return status.isGranted;
-      } else {
-        // Android 12 and below use WRITE_EXTERNAL_STORAGE
-        final status = await Permission.storage.request();
-        return status.isGranted;
-      }
+      // Android 12+ (API 32+) uses READ_MEDIA_IMAGES permission
+      final status = await Permission.photos.request();
+      return status.isGranted;
     }
     return true;
-  }
-  
-  static Future<int> _getAndroidVersion() async {
-    try {
-      // This is a simplified version - in production you'd use device_info_plus
-      return 33; // Assume modern Android
-    } catch (e) {
-      return 33;
-    }
   }
   
   // Download wallpaper

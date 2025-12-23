@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:vibration/vibration.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
 import '../utils/download_manager.dart';
 import '../utils/wallpaper_setter.dart';
+import '../utils/theme_config.dart';
 
 class DetailScreen extends StatefulWidget {
   final Wallpaper wallpaper;
@@ -26,6 +30,13 @@ class _DetailScreenState extends State<DetailScreen> {
   
   Future<void> _downloadWallpaper() async {
     setState(() => _isDownloading = true);
+    
+    // Haptic feedback
+    try {
+      await Vibration.vibrate(duration: 50);
+    } catch (e) {
+      // Vibration not supported
+    }
     
     try {
       debugPrint('Starting download for wallpaper: ${widget.wallpaper.id}');
@@ -52,9 +63,19 @@ class _DetailScreenState extends State<DetailScreen> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Wallpaper downloaded successfully!'),
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Wallpaper downloaded successfully!'),
+                ],
+              ),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+              ),
             ),
           );
         }
@@ -64,8 +85,18 @@ class _DetailScreenState extends State<DetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Download failed: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Download failed: $e')),
+              ],
+            ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+            ),
           ),
         );
       }
@@ -77,6 +108,11 @@ class _DetailScreenState extends State<DetailScreen> {
   }
   
   Future<void> _setWallpaper() async {
+    // Haptic feedback
+    if (await Vibration.hasVibrator() ?? false) {
+      Vibration.vibrate(duration: 50);
+    }
+    
     final downloadsProvider = context.read<DownloadsProvider>();
     var downloadInfo = downloadsProvider.getDownloadInfo(widget.wallpaper.id);
     
@@ -88,9 +124,13 @@ class _DetailScreenState extends State<DetailScreen> {
       if (downloadInfo == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please download the wallpaper first'),
+            SnackBar(
+              content: const Text('Please download the wallpaper first'),
               backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+              ),
             ),
           );
         }
@@ -111,15 +151,42 @@ class _DetailScreenState extends State<DetailScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            success 
-                ? 'Wallpaper set successfully!' 
-                : 'Failed to set wallpaper',
+          content: Row(
+            children: [
+              Icon(
+                success ? Icons.check_circle : Icons.error,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                success 
+                    ? 'Wallpaper set successfully!' 
+                    : 'Failed to set wallpaper',
+              ),
+            ],
           ),
           backgroundColor: success ? Colors.green : Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+          ),
         ),
       );
     }
+  }
+  
+  Future<void> _shareWallpaper() async {
+    // Haptic feedback
+    try {
+      await Vibration.vibrate(duration: 50);
+    } catch (e) {
+      // Vibration not supported
+    }
+    
+    await Share.share(
+      'Check out this wallpaper: ${widget.wallpaper.url}',
+      subject: 'Amazing Wallpaper from WallVault',
+    );
   }
   
   Future<void> _openInBrowser() async {
@@ -150,11 +217,20 @@ class _DetailScreenState extends State<DetailScreen> {
                   isFavorite ? Icons.favorite : Icons.favorite_border,
                   color: isFavorite ? Colors.red : Colors.white,
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  try {
+                    await Vibration.vibrate(duration: 50);
+                  } catch (e) {
+                    // Vibration not supported
+                  }
                   favoritesProvider.toggleFavorite(widget.wallpaper);
                 },
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.share, color: Colors.white),
+            onPressed: _shareWallpaper,
           ),
           IconButton(
             icon: const Icon(Icons.open_in_browser, color: Colors.white),
@@ -164,21 +240,24 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Column(
         children: [
-          // Image viewer
+          // Image viewer with hero animation
           Expanded(
             flex: 3,
-            child: PhotoView(
-              imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
-              minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered * 2,
-              backgroundDecoration: const BoxDecoration(
-                color: Colors.black,
-              ),
-              loadingBuilder: (context, event) => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              errorBuilder: (context, error, stackTrace) => const Center(
-                child: Icon(Icons.error, color: Colors.red, size: 64),
+            child: Hero(
+              tag: 'wallpaper_${widget.wallpaper.id}',
+              child: PhotoView(
+                imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 2,
+                backgroundDecoration: const BoxDecoration(
+                  color: Colors.black,
+                ),
+                loadingBuilder: (context, event) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorBuilder: (context, error, stackTrace) => const Center(
+                  child: Icon(Icons.error, color: Colors.red, size: 64),
+                ),
               ),
             ),
           ),

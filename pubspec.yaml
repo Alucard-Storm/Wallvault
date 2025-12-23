@@ -60,6 +60,33 @@ dependencies:
   # Utilities
   url_launcher: ^6.2.4
   photo_view: ^0.14.0
+  
+  # Material You dynamic colors
+  dynamic_color: ^1.7.0
+  
+  # Download notifications
+  flutter_local_notifications: ^17.0.0
+  
+  # Shimmer loading
+  shimmer: ^3.0.0
+  
+  # Google Fonts
+  google_fonts: ^6.1.0
+  
+  # Animations
+  flutter_animate: ^4.5.0
+  
+  # Haptic feedback
+  vibration: ^2.0.0
+  
+  # Share functionality
+  share_plus: ^10.1.2
+  
+  # Lottie animations
+  lottie: ^3.1.0
+  
+  # Device info for Android version
+  device_info_plus: ^11.1.0
 
 dev_dependencies:
   flutter_test:

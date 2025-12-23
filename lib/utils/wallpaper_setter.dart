@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'wallpaper_manager_channel.dart';
 
 enum WallpaperLocation {
   homeScreen,
@@ -9,9 +9,7 @@ enum WallpaperLocation {
 }
 
 class WallpaperSetter {
-  // Set wallpaper from file path
-  // Note: Due to package compatibility issues, we open the image in the system gallery
-  // where users can set it as wallpaper manually
+  // Set wallpaper using native Android API
   static Future<bool> setWallpaper({
     required String filePath,
     required WallpaperLocation location,
@@ -21,39 +19,52 @@ class WallpaperSetter {
         throw Exception('Wallpaper setting is only supported on Android');
       }
       
-      // Open the file in the default image viewer/gallery
-      // Users can then use the system's "Set as wallpaper" option
-      final file = File(filePath);
-      if (await file.exists()) {
-        final uri = Uri.file(filePath);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-          return true;
-        }
+      // Convert enum to int for native code
+      // 0 = both, 1 = home screen, 2 = lock screen
+      int locationCode;
+      switch (location) {
+        case WallpaperLocation.homeScreen:
+          locationCode = 1;
+          break;
+        case WallpaperLocation.lockScreen:
+          locationCode = 2;
+          break;
+        case WallpaperLocation.both:
+          locationCode = 0;
+          break;
       }
       
-      return false;
+      final success = await WallpaperManagerChannel.setWallpaper(
+        filePath: filePath,
+        location: locationCode,
+      );
+      
+      return success;
     } catch (e) {
-      debugPrint('Error opening wallpaper: $e');
+      debugPrint('Error setting wallpaper: $e');
       return false;
     }
   }
   
   // Show wallpaper location dialog
   static Future<WallpaperLocation?> showLocationDialog(BuildContext context) async {
-    // Show info dialog instead since we're using manual method
     return showDialog<WallpaperLocation>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Set Wallpaper'),
-        content: const Text(
-          'The image will open in your gallery app. '
-          'Use the "Set as wallpaper" option from the menu to apply it.',
-        ),
+        content: const Text('Choose where to apply the wallpaper:'),
         actions: [
           TextButton(
+            onPressed: () => Navigator.pop(context, WallpaperLocation.homeScreen),
+            child: const Text('Home Screen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, WallpaperLocation.lockScreen),
+            child: const Text('Lock Screen'),
+          ),
+          TextButton(
             onPressed: () => Navigator.pop(context, WallpaperLocation.both),
-            child: const Text('Open Image'),
+            child: const Text('Both'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),

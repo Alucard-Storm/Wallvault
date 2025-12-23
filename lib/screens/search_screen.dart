@@ -200,8 +200,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               }
               
-              return WallpaperGridItem(
-                wallpaper: provider.wallpapers[index],
+              final wallpaper = provider.wallpapers[index];
+              final aspectRatio = wallpaper.dimensionX / wallpaper.dimensionY;
+              
+              return AspectRatio(
+                aspectRatio: aspectRatio,
+                child: WallpaperGridItem(
+                  wallpaper: wallpaper,
+                ),
               );
             },
           );
