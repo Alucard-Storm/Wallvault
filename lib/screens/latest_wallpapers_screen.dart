@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/wallpaper_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import 'search_screen.dart';
@@ -28,6 +30,9 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.addListener(_onScroll);
+      // Sync API key from settings to this provider instance
+      final settings = context.read<SettingsProvider>();
+      _provider.setApiKey(settings.apiKey);
     });
   }
   
@@ -51,6 +56,8 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
   }
   
   void _showFilters() {
+    final settings = context.read<SettingsProvider>();
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -60,6 +67,7 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
         currentPurity: _provider.purity,
         currentSorting: _provider.sorting,
         currentOrder: _provider.order,
+        apiKey: settings.apiKey,
         onApply: (categories, purity, sorting, order) {
           // Keep sorting as date_added (latest first), only update categories and purity
           _provider.updateFilters(

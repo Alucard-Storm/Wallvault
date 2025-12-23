@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/wallpaper_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
 
@@ -53,6 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
   
   void _showFilters() {
     final provider = context.read<WallpaperProvider>();
+    final settings = context.read<SettingsProvider>();
     
     showModalBottomSheet(
       context: context,
@@ -63,6 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
         currentPurity: provider.purity,
         currentSorting: provider.sorting,
         currentOrder: provider.order,
+        apiKey: settings.apiKey,
         onApply: (categories, purity, sorting, order) {
           provider.updateFilters(
             categories: categories,

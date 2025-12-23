@@ -7,10 +7,9 @@ import '../utils/constants.dart';
 
 class WallhavenApi {
   static const String _baseUrl = AppConstants.wallhavenBaseUrl;
-  static const String? _apiKey = AppConstants.apiKey;
   
   // Build query parameters
-  Map<String, String> _buildParams(Map<String, dynamic> params) {
+  Map<String, String> _buildParams(Map<String, dynamic> params, {String? apiKey}) {
     final Map<String, String> queryParams = {};
     
     params.forEach((key, value) {
@@ -19,7 +18,6 @@ class WallhavenApi {
       }
     });
     
-    final apiKey = _apiKey;
     if (apiKey != null && apiKey.isNotEmpty) {
       queryParams['apikey'] = apiKey;
     }
@@ -39,6 +37,7 @@ class WallhavenApi {
     String? resolutions,
     String? ratios,
     String? colors,
+    String? apiKey,
   }) async {
     try {
       final params = _buildParams({
@@ -52,7 +51,7 @@ class WallhavenApi {
         'resolutions': resolutions,
         'ratios': ratios,
         'colors': colors,
-      });
+      }, apiKey: apiKey);
       
       final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
       final response = await http.get(uri);
@@ -81,6 +80,7 @@ class WallhavenApi {
     String? resolutions,
     String? ratios,
     String? colors,
+    String? apiKey,
   }) async {
     try {
       final params = _buildParams({
@@ -94,7 +94,7 @@ class WallhavenApi {
         'resolutions': resolutions,
         'ratios': ratios,
         'colors': colors,
-      });
+      }, apiKey: apiKey);
       
       final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
       final response = await http.get(uri);
@@ -118,6 +118,7 @@ class WallhavenApi {
     String? categories,
     String? purity,
     String? sorting,
+    String? apiKey,
   }) async {
     return getWallpapers(
       page: page,
@@ -125,13 +126,14 @@ class WallhavenApi {
       purity: purity,
       sorting: sorting ?? AppConstants.sortRandom,
       colors: color,
+      apiKey: apiKey,
     );
   }
   
   // Get wallpaper details
-  Future<WallpaperDetail> getWallpaperDetails(String id) async {
+  Future<WallpaperDetail> getWallpaperDetails(String id, {String? apiKey}) async {
     try {
-      final params = _buildParams({});
+      final params = _buildParams({}, apiKey: apiKey);
       final uri = Uri.parse('$_baseUrl/w/$id').replace(queryParameters: params);
       final response = await http.get(uri);
       
@@ -152,12 +154,14 @@ class WallhavenApi {
     int page = 1,
     String? purity,
     String? sorting,
+    String? apiKey,
   }) async {
     return searchWallpapers(
       query: 'id:$tagId',
       page: page,
       purity: purity,
       sorting: sorting,
+      apiKey: apiKey,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../providers/settings_provider.dart';
+import '../providers/wallpaper_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
 import '../utils/constants.dart';
@@ -163,6 +164,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 icon: const Icon(Icons.save),
                                 onPressed: () {
                                   settings.setApiKey(_apiKeyController.text);
+                                  // Sync API key to WallpaperProvider
+                                  context.read<WallpaperProvider>().setApiKey(_apiKeyController.text.isEmpty ? null : _apiKeyController.text);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('API key saved'),
@@ -573,6 +576,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final purity = {
       'sfw': settings.defaultPurity[0] == '1',
       'sketchy': settings.defaultPurity[1] == '1',
+      'nsfw': settings.defaultPurity.length > 2 && settings.defaultPurity[2] == '1',
     };
     
     return Wrap(
@@ -584,7 +588,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           onSelected: (value) {
             final newPurity = '${value ? '1' : '0'}'
                 '${purity['sketchy']! ? '1' : '0'}'
-                '0';
+                '${purity['nsfw']! ? '1' : '0'}';
             settings.setDefaultPurity(newPurity);
           },
         ),
@@ -594,10 +598,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           onSelected: (value) {
             final newPurity = '${purity['sfw']! ? '1' : '0'}'
                 '${value ? '1' : '0'}'
-                '0';
+                '${purity['nsfw']! ? '1' : '0'}';
             settings.setDefaultPurity(newPurity);
           },
         ),
+        if (settings.apiKey != null && settings.apiKey!.isNotEmpty)
+          FilterChip(
+            label: const Text('NSFW'),
+            selected: purity['nsfw']!,
+            onSelected: (value) {
+              final newPurity = '${purity['sfw']! ? '1' : '0'}'
+                  '${purity['sketchy']! ? '1' : '0'}'
+                  '${value ? '1' : '0'}';
+              settings.setDefaultPurity(newPurity);
+            },
+          ),
       ],
     );
   }

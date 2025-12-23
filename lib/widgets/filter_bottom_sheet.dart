@@ -6,6 +6,7 @@ class FilterBottomSheet extends StatefulWidget {
   final String currentPurity;
   final String currentSorting;
   final String currentOrder;
+  final String? apiKey;
   final Function(String categories, String purity, String sorting, String order) onApply;
   
   const FilterBottomSheet({
@@ -14,6 +15,7 @@ class FilterBottomSheet extends StatefulWidget {
     required this.currentPurity,
     required this.currentSorting,
     required this.currentOrder,
+    this.apiKey,
     required this.onApply,
   });
   
@@ -42,6 +44,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     purity = {
       'sfw': widget.currentPurity[0] == '1',
       'sketchy': widget.currentPurity[1] == '1',
+      'nsfw': widget.currentPurity.length > 2 && widget.currentPurity[2] == '1',
     };
     
     sorting = widget.currentSorting;
@@ -57,7 +60,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   String _buildPurityString() {
     return '${purity['sfw']! ? '1' : '0'}'
         '${purity['sketchy']! ? '1' : '0'}'
-        '0'; // NSFW always 0 (requires API key)
+        '${purity['nsfw']! ? '1' : '0'}';
   }
   
   @override
@@ -154,6 +157,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   setState(() => purity['sketchy'] = value);
                 },
               ),
+              if (widget.apiKey != null && widget.apiKey!.isNotEmpty)
+                FilterChip(
+                  label: const Text('NSFW'),
+                  selected: purity['nsfw']!,
+                  onSelected: (value) {
+                    setState(() => purity['nsfw'] = value);
+                  },
+                ),
             ],
           ),
           const SizedBox(height: 20),

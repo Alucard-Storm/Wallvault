@@ -30,7 +30,18 @@ class WallVaultApp extends StatelessWidget {
         builder: (context, settings, child) {
           // Load settings asynchronously if not loaded
           if (!settings.isLoaded) {
-            Future.microtask(() => settings.loadSettings());
+            Future.microtask(() async {
+              await settings.loadSettings();
+              // Sync API key to WallpaperProvider after settings are loaded
+              if (context.mounted) {
+                context.read<WallpaperProvider>().setApiKey(settings.apiKey);
+              }
+            });
+          } else {
+            // Sync API key whenever settings change
+            Future.microtask(() {
+              context.read<WallpaperProvider>().setApiKey(settings.apiKey);
+            });
           }
           
           // Use default colors if settings not loaded yet

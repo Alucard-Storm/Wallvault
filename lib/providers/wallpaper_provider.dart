@@ -11,6 +11,7 @@ class WallpaperProvider with ChangeNotifier {
   bool _hasMore = true;
   int _currentPage = 1;
   String? _error;
+  String? _apiKey;
   
   // Filter options
   String _categories = AppConstants.categoryAll;
@@ -33,6 +34,11 @@ class WallpaperProvider with ChangeNotifier {
   String? get topRange => _topRange;
   String? get searchQuery => _searchQuery;
   String? get selectedColor => _selectedColor;
+  
+  // Set API key
+  void setApiKey(String? apiKey) {
+    _apiKey = apiKey;
+  }
   
   // Load wallpapers
   Future<void> loadWallpapers({bool refresh = false}) async {
@@ -61,6 +67,7 @@ class WallpaperProvider with ChangeNotifier {
           sorting: _sorting,
           order: _order,
           colors: _selectedColor,
+          apiKey: _apiKey,
         );
       } else if (_selectedColor != null) {
         newWallpapers = await _api.searchByColor(
@@ -69,6 +76,7 @@ class WallpaperProvider with ChangeNotifier {
           categories: _categories,
           purity: _purity,
           sorting: _sorting,
+          apiKey: _apiKey,
         );
       } else {
         newWallpapers = await _api.getWallpapers(
@@ -79,6 +87,7 @@ class WallpaperProvider with ChangeNotifier {
           order: _order,
           topRange: _topRange,
           colors: _selectedColor,
+          apiKey: _apiKey,
         );
       }
       
