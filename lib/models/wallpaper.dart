@@ -1,3 +1,6 @@
+import 'tag.dart';
+import 'package:flutter/foundation.dart';
+
 class Wallpaper {
   final String id;
   final String url;
@@ -17,6 +20,7 @@ class Wallpaper {
   final List<String> colors;
   final String path;
   final String thumbs;
+  final List<Tag> tags;
   
   Wallpaper({
     required this.id,
@@ -37,9 +41,13 @@ class Wallpaper {
     required this.colors,
     required this.path,
     required this.thumbs,
+    required this.tags,
   });
   
   factory Wallpaper.fromJson(Map<String, dynamic> json) {
+    final tags = (json['tags'] as List?)?.map((tag) => Tag.fromJson(tag)).toList() ?? [];
+    debugPrint('Wallpaper ${json['id']} has ${tags.length} tags');
+    
     return Wallpaper(
       id: json['id'],
       url: json['url'],
@@ -59,6 +67,7 @@ class Wallpaper {
       colors: List<String>.from(json['colors']),
       path: json['path'],
       thumbs: json['thumbs']['large'],
+      tags: tags,
     );
   }
   
@@ -82,6 +91,7 @@ class Wallpaper {
       'colors': colors,
       'path': path,
       'thumbs': {'large': thumbs},
+      'tags': tags.map((tag) => tag.toJson()).toList(),
     };
   }
   

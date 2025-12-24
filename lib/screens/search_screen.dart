@@ -7,7 +7,9 @@ import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final String? initialQuery;
+  
+  const SearchScreen({super.key, this.initialQuery});
   
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -21,6 +23,14 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    
+    // If initial query is provided, set it and perform search
+    if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+      _searchController.text = widget.initialQuery!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _performSearch();
+      });
+    }
   }
   
   @override

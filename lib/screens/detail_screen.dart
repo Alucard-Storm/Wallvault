@@ -8,9 +8,12 @@ import 'package:vibration/vibration.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
+import '../providers/settings_provider.dart';
+import '../services/wallhaven_api.dart';
 import '../utils/download_manager.dart';
 import '../utils/wallpaper_setter.dart';
 import '../utils/theme_config.dart';
+import 'search_screen.dart';
 
 class DetailScreen extends StatefulWidget {
   final Wallpaper wallpaper;
@@ -26,6 +29,60 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   double? _downloadProgress;
+  Wallpaper? _detailedWallpaper;
+  bool _isLoadingDetails = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadWallpaperDetails();
+  }
+  
+  Future<void> _loadWallpaperDetails() async {
+    setState(() => _isLoadingDetails = true);
+    
+    try {
+      final settingsProvider = context.read<SettingsProvider>();
+      final api = WallhavenApi();
+      final details = await api.getWallpaperDetails(
+        widget.wallpaper.id,
+        apiKey: settingsProvider.apiKey,
+      );
+      
+      // Convert WallpaperDetail to Wallpaper with tags
+      if (mounted) {
+        setState(() {
+          _detailedWallpaper = Wallpaper(
+            id: details.id,
+            url: details.url,
+            shortUrl: details.shortUrl,
+            views: details.views,
+            favorites: details.favorites,
+            source: details.source,
+            purity: details.purity,
+            category: details.category,
+            dimensionX: details.dimensionX,
+            dimensionY: details.dimensionY,
+            resolution: details.resolution,
+            ratio: details.ratio,
+            fileSize: details.fileSize,
+            fileType: details.fileType,
+            createdAt: details.createdAt,
+            colors: details.colors,
+            path: details.path,
+            thumbs: details.thumbs,
+            tags: details.tags,
+          );
+          _isLoadingDetails = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading wallpaper details: $e');
+      if (mounted) {
+        setState(() => _isLoadingDetails = false);
+      }
+    }
+  }
   
   Future<void> _downloadWallpaper() async {
     final downloadsProvider = context.read<DownloadsProvider>();
@@ -416,6 +473,69 @@ class _DetailScreenState extends State<DetailScreen> {
                             ),
                           );
                         }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                    
+                    // Tags
+                    if (_detailedWallpaper != null && _detailedWallpaper!.tags.isNotEmpty) ...[
+                      const Text(
+                        'Tags',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: _detailedWallpaper!.tags.map((tag) {
+                          return ActionChip(
+                            label: Text(
+                              tag.name,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                            avatar: Icon(
+                              Icons.tag,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
+                              // Navigate to search screen with tag query
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SearchScreen(
+                                    initialQuery: tag.name,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ] else if (_isLoadingDetails) ...[
+                      const Text(
+                        'Tags',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const SizedBox(
+                        height: 32,
+                        child: Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                     ],
