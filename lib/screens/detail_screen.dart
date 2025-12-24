@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
@@ -26,10 +25,59 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  bool _isDownloading = false;
+  double? _downloadProgress;
   
   Future<void> _downloadWallpaper() async {
-    setState(() => _isDownloading = true);
+    final downloadsProvider = context.read<DownloadsProvider>();
+    
+    // Check if already downloaded
+    if (downloadsProvider.isDownloaded(widget.wallpaper.id)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.info, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Wallpaper already downloaded'),
+              ],
+            ),
+            backgroundColor: Colors.blue,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // Check if already in queue
+    if (DownloadManager.isInQueue(widget.wallpaper.id)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.queue, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Already in download queue'),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // Add to queue tracking
+    downloadsProvider.addToQueue(widget.wallpaper.id);
     
     // Haptic feedback
     try {
@@ -38,17 +86,46 @@ class _DetailScreenState extends State<DetailScreen> {
       // Vibration not supported
     }
     
+    // Show queue notification
+    final queuePosition = DownloadManager.queueLength + 1;
+    if (mounted && queuePosition > 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.queue, color: Colors.white),
+              const SizedBox(width: 12),
+              Text('Added to queue (Position: $queuePosition)'),
+            ],
+          ),
+          backgroundColor: Colors.blue,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+    
     try {
       debugPrint('Starting download for wallpaper: ${widget.wallpaper.id}');
       final filePath = await DownloadManager.downloadWallpaper(
         url: widget.wallpaper.path,
         wallpaperId: widget.wallpaper.id,
+        onProgress: (progress) {
+          if (mounted) {
+            setState(() {
+              _downloadProgress = progress;
+            });
+            downloadsProvider.updateProgress(widget.wallpaper.id, progress);
+          }
+        },
       );
       
       debugPrint('Download completed, filePath: $filePath');
       
       if (filePath != null && mounted) {
-        final downloadsProvider = context.read<DownloadsProvider>();
         await downloadsProvider.addDownload(
           DownloadInfo(
             wallpaperId: widget.wallpaper.id,
@@ -102,15 +179,20 @@ class _DetailScreenState extends State<DetailScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isDownloading = false);
+        setState(() {
+          _downloadProgress = null;
+        });
+        downloadsProvider.removeFromQueue(widget.wallpaper.id);
       }
     }
   }
   
   Future<void> _setWallpaper() async {
     // Haptic feedback
-    if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate(duration: 50);
+    try {
+      await Vibration.vibrate(duration: 50);
+    } catch (e) {
+      // Vibration not supported
     }
     
     final downloadsProvider = context.read<DownloadsProvider>();
@@ -347,32 +429,57 @@ class _DetailScreenState extends State<DetailScreen> {
                               final isDownloaded = downloadsProvider.isDownloaded(
                                 widget.wallpaper.id,
                               );
+                              final isInQueue = downloadsProvider.isInQueue(
+                                widget.wallpaper.id,
+                              );
+                              final progress = downloadsProvider.getProgress(
+                                widget.wallpaper.id,
+                              );
                               
-                              return ElevatedButton.icon(
-                                onPressed: _isDownloading ? null : _downloadWallpaper,
-                                icon: _isDownloading
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                              String buttonText;
+                              IconData buttonIcon;
+                              bool isDisabled = false;
+                              
+                              if (isDownloaded) {
+                                buttonText = 'Downloaded';
+                                buttonIcon = Icons.download_done;
+                              } else if (progress != null && progress > 0) {
+                                buttonText = '${(progress * 100).toInt()}%';
+                                buttonIcon = Icons.downloading;
+                                isDisabled = true;
+                              } else if (isInQueue) {
+                                buttonText = 'In Queue';
+                                buttonIcon = Icons.queue;
+                                isDisabled = true;
+                              } else {
+                                buttonText = 'Download';
+                                buttonIcon = Icons.download;
+                              }
+                              
+                              return Stack(
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: isDisabled ? null : _downloadWallpaper,
+                                    icon: Icon(buttonIcon),
+                                    label: Text(buttonText),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                  ),
+                                  if (progress != null && progress > 0)
+                                    Positioned.fill(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: LinearProgressIndicator(
+                                          value: progress,
+                                          backgroundColor: Colors.transparent,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Theme.of(context).primaryColor.withOpacity(0.3),
+                                          ),
                                         ),
-                                      )
-                                    : Icon(
-                                        isDownloaded 
-                                            ? Icons.download_done 
-                                            : Icons.download,
                                       ),
-                                label: Text(
-                                  _isDownloading 
-                                      ? 'Downloading...' 
-                                      : isDownloaded 
-                                          ? 'Downloaded' 
-                                          : 'Download',
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                ),
+                                    ),
+                                ],
                               );
                             },
                           ),

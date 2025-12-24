@@ -43,6 +43,7 @@ class DownloadsProvider with ChangeNotifier {
   List<DownloadInfo> _downloads = [];
   bool _isLoaded = false;
   final Map<String, double> _downloadProgress = {};
+  final Set<String> _queuedDownloads = {};
   
   List<DownloadInfo> get downloads => _downloads;
   bool get isLoaded => _isLoaded;
@@ -50,6 +51,23 @@ class DownloadsProvider with ChangeNotifier {
   // Get download progress for a wallpaper
   double? getProgress(String wallpaperId) {
     return _downloadProgress[wallpaperId];
+  }
+  
+  // Check if wallpaper is in download queue
+  bool isInQueue(String wallpaperId) {
+    return _queuedDownloads.contains(wallpaperId);
+  }
+  
+  // Add to queue tracking
+  void addToQueue(String wallpaperId) {
+    _queuedDownloads.add(wallpaperId);
+    notifyListeners();
+  }
+  
+  // Remove from queue tracking
+  void removeFromQueue(String wallpaperId) {
+    _queuedDownloads.remove(wallpaperId);
+    notifyListeners();
   }
   
   // Load downloads from storage
