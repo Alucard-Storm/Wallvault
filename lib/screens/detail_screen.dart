@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:vibration/vibration.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
@@ -15,6 +14,10 @@ import '../utils/download_manager.dart';
 import '../utils/wallpaper_setter.dart';
 import '../utils/theme_config.dart';
 import '../utils/glass_config.dart';
+import '../utils/haptic_manager.dart';
+import '../utils/gesture_config.dart';
+import '../widgets/animated_color_palette.dart';
+import '../widgets/wallpaper_preview_frame.dart';
 import 'search_screen.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -33,6 +36,8 @@ class _DetailScreenState extends State<DetailScreen> {
   double? _downloadProgress;
   Wallpaper? _detailedWallpaper;
   bool _isLoadingDetails = false;
+  Offset? _swipeStart;
+  Offset? _swipeEnd;
   
   @override
   void initState() {
@@ -139,11 +144,7 @@ class _DetailScreenState extends State<DetailScreen> {
     downloadsProvider.addToQueue(widget.wallpaper.id);
     
     // Haptic feedback
-    try {
-      await Vibration.vibrate(duration: 50);
-    } catch (e) {
-      // Vibration not supported
-    }
+    HapticManager.downloadStart();
     
     // Show queue notification
     final queuePosition = DownloadManager.queueLength + 1;
@@ -248,11 +249,7 @@ class _DetailScreenState extends State<DetailScreen> {
   
   Future<void> _setWallpaper() async {
     // Haptic feedback
-    try {
-      await Vibration.vibrate(duration: 50);
-    } catch (e) {
-      // Vibration not supported
-    }
+    HapticManager.mediumTap();
     
     final downloadsProvider = context.read<DownloadsProvider>();
     var downloadInfo = downloadsProvider.getDownloadInfo(widget.wallpaper.id);
@@ -317,16 +314,36 @@ class _DetailScreenState extends State<DetailScreen> {
   }
   
   Future<void> _shareWallpaper() async {
-    // Haptic feedback
-    try {
-      await Vibration.vibrate(duration: 50);
-    } catch (e) {
-      // Vibration not supported
-    }
-    
+    HapticManager.lightTap();
     await Share.share(
       'Check out this wallpaper: ${widget.wallpaper.url}',
       subject: 'Amazing Wallpaper from WallVault',
+    );
+  }
+  
+  void _showPreview() {
+    HapticManager.mediumTap();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WallpaperPreviewFrame(
+          imageUrl: widget.wallpaper.path,
+        ),
+      ),
+    );
+  }
+  
+  void _searchByColor(Color color) {
+    HapticManager.lightTap();
+    final hexColor = color.value.toRadixString(16).substring(2);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchScreen(
+          initialQuery: '',
+          initialColor: hexColor,
+        ),
+      ),
     );
   }
   
@@ -358,12 +375,8 @@ class _DetailScreenState extends State<DetailScreen> {
                   isFavorite ? Icons.favorite : Icons.favorite_border,
                   color: isFavorite ? Colors.red : Colors.white,
                 ),
-                onPressed: () async {
-                  try {
-                    await Vibration.vibrate(duration: 50);
-                  } catch (e) {
-                    // Vibration not supported
-                  }
+                onPressed: () {
+                  HapticManager.favorite();
                   favoritesProvider.toggleFavorite(widget.wallpaper);
                 },
               );
@@ -374,40 +387,67 @@ class _DetailScreenState extends State<DetailScreen> {
             onPressed: _shareWallpaper,
           ),
           IconButton(
+            icon: const Icon(Icons.phone_android, color: Colors.white),
+            onPressed: _showPreview,
+          ),
+          IconButton(
             icon: const Icon(Icons.open_in_browser, color: Colors.white),
             onPressed: _openInBrowser,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Image viewer with hero animation and overlay buttons
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                // Image viewer
-                Hero(
-                  tag: 'wallpaper_${widget.wallpaper.id}',
-                  child: Container(
-                    color: Colors.black,
-                    child: PhotoView(
-                      imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
-                      minScale: PhotoViewComputedScale.contained,
-                      maxScale: PhotoViewComputedScale.covered * 2,
-                      initialScale: PhotoViewComputedScale.contained,
-                      backgroundDecoration: const BoxDecoration(
-                        color: Colors.black,
-                      ),
-                      loadingBuilder: (context, event) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Icon(Icons.error, color: Colors.red, size: 64),
+      body: GestureDetector(
+        onPanStart: (details) {
+          _swipeStart = details.globalPosition;
+        },
+        onPanEnd: (details) {
+          if (_swipeStart != null && _swipeEnd != null) {
+            final direction = GestureConfig.detectSwipeDirection(
+              details,
+              _swipeStart!,
+              _swipeEnd!,
+            );
+            
+            if (direction == SwipeDirection.right || direction == SwipeDirection.left) {
+              HapticManager.swipe();
+              // Could navigate to next/previous wallpaper if in a list context
+            }
+          }
+          _swipeStart = null;
+          _swipeEnd = null;
+        },
+        onPanUpdate: (details) {
+          _swipeEnd = details.globalPosition;
+        },
+        child: Column(
+          children: [
+            // Image viewer with hero animation and overlay buttons
+            Expanded(
+              flex: 3,
+              child: Stack(
+                children: [
+                  // Image viewer
+                  Hero(
+                    tag: 'wallpaper_${widget.wallpaper.id}',
+                    child: Container(
+                      color: Colors.black,
+                      child: PhotoView(
+                        imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
+                        minScale: PhotoViewComputedScale.contained,
+                        maxScale: PhotoViewComputedScale.covered * 2,
+                        initialScale: PhotoViewComputedScale.contained,
+                        backgroundDecoration: const BoxDecoration(
+                          color: Colors.black,
+                        ),
+                        loadingBuilder: (context, event) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(Icons.error, color: Colors.red, size: 64),
+                        ),
                       ),
                     ),
                   ),
-                ),
                 
                 // Glass overlay buttons at bottom
                 Positioned(
@@ -601,7 +641,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         _buildInfoRow('Ratio', widget.wallpaper.ratio),
                         const SizedBox(height: 12),
                         
-                        // Colors
+                        // Colors with animated palette
                         if (widget.wallpaper.colors.isNotEmpty) ...[
                           const Text(
                             'Colors',
@@ -611,22 +651,15 @@ class _DetailScreenState extends State<DetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: widget.wallpaper.colors.map((color) {
-                              return Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Color(
-                                    int.parse('FF${color.substring(1)}', radix: 16),
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white24),
-                                ),
+                          AnimatedColorPalette(
+                            colors: widget.wallpaper.colors.map((color) {
+                              return Color(
+                                int.parse('FF${color.substring(1)}', radix: 16),
                               );
                             }).toList(),
+                            onColorTap: _searchByColor,
+                            chipSize: 48,
+                            spacing: 12,
                           ),
                           const SizedBox(height: 20),
                         ],
@@ -702,6 +735,7 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ],
       ),
+      ), // GestureDetector
     );
   }
   

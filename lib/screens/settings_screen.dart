@@ -266,7 +266,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionHeader('Appearance'),
               GlassSettingsCard(
                 title: 'Appearance',
-                padding: EdgeInsets.zero,
                 children: [
                   ListTile(
                     leading: const Icon(Icons.dark_mode),
@@ -401,7 +400,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionHeader('Storage & Cache'),
               GlassSettingsCard(
                 title: 'Storage & Cache',
-                padding: EdgeInsets.zero,
                 children: [
                   ListTile(
                     leading: const Icon(Icons.delete_outline),
@@ -435,7 +433,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionHeader('Data Management'),
               GlassSettingsCard(
                 title: 'Data Management',
-                padding: EdgeInsets.zero,
                 children: [
                   Consumer<FavoritesProvider>(
                     builder: (context, favorites, child) {
@@ -466,7 +463,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSectionHeader('About'),
               GlassSettingsCard(
                 title: 'About',
-                padding: EdgeInsets.zero,
                 children: [
                   const ListTile(
                     leading: Icon(Icons.info_outline),

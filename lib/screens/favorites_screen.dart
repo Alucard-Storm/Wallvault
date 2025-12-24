@@ -4,6 +4,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/favorites_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/glass_nav_bar.dart';
+import '../widgets/glass_empty_state.dart';
+import '../widgets/glass_pull_refresh.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -62,53 +64,36 @@ class FavoritesScreen extends StatelessWidget {
           }
           
           if (provider.favorites.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.favorite_border,
-                    size: 64,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No favorites yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap the heart icon on wallpapers to save them here',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
+            return GlassEmptyState.favorites(
+              onBrowse: () {
+                // Navigate to top wallpapers tab
+                DefaultTabController.of(context)?.animateTo(0);
+              },
             );
           }
           
-          return MasonryGridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            padding: EdgeInsets.only(
-              left: 8,
-              right: 8,
-              top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
-              bottom: 100,
-            ),
-            itemCount: provider.favorites.length,
-            itemBuilder: (context, index) {
-              return WallpaperGridItem(
-                wallpaper: provider.favorites[index],
-              );
+          return GlassPullRefresh(
+            onRefresh: () async {
+              // Reload favorites from storage
+              await provider.loadFavorites();
             },
+            child: MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+                bottom: 100,
+              ),
+              itemCount: provider.favorites.length,
+              itemBuilder: (context, index) {
+                return WallpaperGridItem(
+                  wallpaper: provider.favorites[index],
+                );
+              },
+            ),
           );
         },
       ),

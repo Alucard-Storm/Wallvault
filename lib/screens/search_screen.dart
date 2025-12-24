@@ -10,8 +10,9 @@ import '../widgets/glass_search_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? initialQuery;
+  final String? initialColor;
   
-  const SearchScreen({super.key, this.initialQuery});
+  const SearchScreen({super.key, this.initialQuery, this.initialColor});
   
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -31,6 +32,14 @@ class _SearchScreenState extends State<SearchScreen> {
       _searchController.text = widget.initialQuery!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _performSearch();
+      });
+    }
+    
+    // If initial color is provided, search by color
+    if (widget.initialColor != null && widget.initialColor!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Search using color hex
+        context.read<WallpaperProvider>().search(widget.initialColor!);
       });
     }
   }

@@ -90,6 +90,13 @@ dependencies:
   
   # Liquid glass UI effects
   liquid_glass_renderer: ^0.2.0-dev.4
+  
+  # Advanced animations and interactions
+  carousel_slider: ^5.0.0
+  fl_chart: ^0.69.0
+  confetti: ^0.7.0
+  animations: ^2.0.11
+  page_view_dot_indicator: ^2.3.0
 
 dev_dependencies:
   flutter_test:
