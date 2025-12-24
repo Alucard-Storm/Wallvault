@@ -5,6 +5,9 @@ import '../providers/wallpaper_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
+import '../widgets/glass_nav_bar.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/loading_state_widget.dart';
 import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -87,8 +90,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     super.build(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: widget.title,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -109,38 +113,14 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       ),
       body: Consumer<WallpaperProvider>(
         builder: (context, provider, child) {
-          debugPrint('HomeScreen - Wallpapers: ${provider.wallpapers.length}, Loading: ${provider.isLoading}, Error: ${provider.error}');
-          
           if (provider.wallpapers.isEmpty && provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const LoadingStateWidget();
           }
           
           if (provider.error != null && provider.wallpapers.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading wallpapers',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    provider.error!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onRefresh,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
+            return ErrorStateWidget(
+              message: provider.error!,
+              onRetry: _onRefresh,
             );
           }
           
@@ -157,7 +137,12 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               crossAxisCount: 2,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+                bottom: 100, // Extra padding for floating nav bar
+              ),
               itemCount: provider.wallpapers.length + (provider.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= provider.wallpapers.length) {

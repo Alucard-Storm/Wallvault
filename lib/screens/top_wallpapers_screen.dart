@@ -5,6 +5,9 @@ import '../providers/wallpaper_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
+import '../widgets/glass_nav_bar.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/loading_state_widget.dart';
 import 'search_screen.dart';
 import '../utils/constants.dart';
 
@@ -85,8 +88,9 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen> with Automati
     super.build(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Top Wallpapers'),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: 'Top Wallpapers',
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -108,38 +112,14 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen> with Automati
       body: ListenableBuilder(
         listenable: _provider,
         builder: (context, child) {
-          debugPrint('TopScreen - Wallpapers: ${_provider.wallpapers.length}, Loading: ${_provider.isLoading}, Error: ${_provider.error}');
-          
           if (_provider.wallpapers.isEmpty && _provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const LoadingStateWidget();
           }
           
           if (_provider.error != null && _provider.wallpapers.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading wallpapers',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _provider.error!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onRefresh,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
+            return ErrorStateWidget(
+              message: _provider.error!,
+              onRetry: _onRefresh,
             );
           }
           
@@ -156,11 +136,14 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen> with Automati
               crossAxisCount: 2,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+                bottom: 100, // Extra padding for floating nav bar
+              ),
               itemCount: _provider.wallpapers.length + (_provider.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
-                debugPrint('Building grid item $index of ${_provider.wallpapers.length}');
-                
                 if (index >= _provider.wallpapers.length) {
                   return const Center(
                     child: Padding(
@@ -170,14 +153,8 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen> with Automati
                   );
                 }
                 
-                final wallpaper = _provider.wallpapers[index];
-                final aspectRatio = wallpaper.dimensionX / wallpaper.dimensionY;
-                
-                return AspectRatio(
-                  aspectRatio: aspectRatio,
-                  child: WallpaperGridItem(
-                    wallpaper: wallpaper,
-                  ),
+                return WallpaperGridItem(
+                  wallpaper: _provider.wallpapers[index],
                 );
               },
             ),

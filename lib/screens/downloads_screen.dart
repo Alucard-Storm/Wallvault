@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/downloads_provider.dart';
 import '../utils/download_manager.dart';
+import '../widgets/glass_nav_bar.dart';
+import '../widgets/glass_settings_card.dart';
 import 'downloaded_wallpaper_viewer.dart';
 
 class DownloadsScreen extends StatelessWidget {
@@ -12,8 +14,9 @@ class DownloadsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Downloads'),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: 'Downloads',
         actions: [
           Consumer<DownloadsProvider>(
             builder: (context, provider, child) {
@@ -21,33 +24,19 @@ class DownloadsScreen extends StatelessWidget {
               
               return IconButton(
                 icon: const Icon(Icons.delete_outline),
-                onPressed: () {
-                  showDialog(
+                onPressed: () async {
+                  final result = await GlassDialog.show(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Clear Downloads'),
-                      content: const Text(
-                        'Are you sure you want to clear the downloads list? '
+                    title: 'Clear Downloads',
+                    content: 'Are you sure you want to clear the downloads list? '
                         'This will not delete the files from your device.',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            provider.clearDownloads();
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Clear',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
+                    confirmText: 'Clear',
+                    cancelText: 'Cancel',
                   );
+                  
+                  if (result == true && context.mounted) {
+                    provider.clearDownloads();
+                  }
                 },
               );
             },
@@ -100,7 +89,12 @@ class DownloadsScreen extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.only(
+              left: 8,
+              right: 8,
+              top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+              bottom: 100,
+            ),
             itemCount: provider.downloads.length,
             itemBuilder: (context, index) {
               final download = provider.downloads[index];

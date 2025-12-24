@@ -5,6 +5,8 @@ import '../providers/wallpaper_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
+import '../widgets/glass_nav_bar.dart';
+import '../widgets/glass_search_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? initialQuery;
@@ -91,140 +93,143 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'Search wallpapers...',
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: _clearSearch,
-                  )
-                : null,
-          ),
-          textInputAction: TextInputAction.search,
-          onSubmitted: (_) => _performSearch(),
-          onChanged: (_) => setState(() {}),
-        ),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: 'Search',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _performSearch,
-          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilters,
           ),
         ],
       ),
-      body: Consumer<WallpaperProvider>(
-        builder: (context, provider, child) {
-          if (provider.searchQuery == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search,
-                    size: 64,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Search for wallpapers',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
+      body: Column(
+        children: [
+          // Glass search bar
+          GlassSearchBar(
+            controller: _searchController,
+            hintText: 'Search wallpapers...',
+            autofocus: true,
+            onChanged: (_) => setState(() {}),
+            onSubmitted: _performSearch,
+            onClear: _clearSearch,
+          ),
+          
+          // Search results
+          Expanded(
+            child: Consumer<WallpaperProvider>(
+              builder: (context, provider, child) {
+                if (provider.searchQuery == null) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 64,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Search for wallpapers',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          if (provider.wallpapers.isEmpty && provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          
-          if (provider.error != null && provider.wallpapers.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error searching wallpapers',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    provider.error!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          if (provider.wallpapers.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off,
-                    size: 64,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No results found',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          return MasonryGridView.count(
-            controller: _scrollController,
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            padding: const EdgeInsets.all(8),
-            itemCount: provider.wallpapers.length + (provider.hasMore ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index >= provider.wallpapers.length) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                  );
+                }
+                
+                if (provider.wallpapers.isEmpty && provider.isLoading) {
+                  return const Center(
                     child: CircularProgressIndicator(),
+                  );
+                }
+                
+                if (provider.error != null && provider.wallpapers.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error searching wallpapers',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          provider.error!,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                
+                if (provider.wallpapers.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No results found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                
+                return MasonryGridView.count(
+                  controller: _scrollController,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    right: 8,
+                    top: 8,
+                    bottom: 100,
                   ),
+                  itemCount: provider.wallpapers.length + (provider.hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= provider.wallpapers.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    
+                    final wallpaper = provider.wallpapers[index];
+                    final aspectRatio = wallpaper.dimensionX / wallpaper.dimensionY;
+                    
+                    return AspectRatio(
+                      aspectRatio: aspectRatio,
+                      child: WallpaperGridItem(
+                        wallpaper: wallpaper,
+                      ),
+                    );
+                  },
                 );
-              }
-              
-              final wallpaper = provider.wallpapers[index];
-              final aspectRatio = wallpaper.dimensionX / wallpaper.dimensionY;
-              
-              return AspectRatio(
-                aspectRatio: aspectRatio,
-                child: WallpaperGridItem(
-                  wallpaper: wallpaper,
-                ),
-              );
-            },
-          );
-        },
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

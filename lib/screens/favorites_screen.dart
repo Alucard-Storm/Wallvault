@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../providers/favorites_provider.dart';
 import '../widgets/wallpaper_grid_item.dart';
+import '../widgets/glass_nav_bar.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -10,8 +11,9 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Favorites'),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: 'Favorites',
         actions: [
           Consumer<FavoritesProvider>(
             builder: (context, provider, child) {
@@ -95,7 +97,12 @@ class FavoritesScreen extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.only(
+              left: 8,
+              right: 8,
+              top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+              bottom: 100,
+            ),
             itemCount: provider.favorites.length,
             itemBuilder: (context, index) {
               return WallpaperGridItem(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../utils/constants.dart';
+import '../utils/filter_utils.dart';
+import '../widgets/category_purity_chips.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final String currentCategories;
@@ -33,45 +36,31 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   void initState() {
     super.initState();
     
-    // Parse categories
-    categories = {
-      'general': widget.currentCategories[0] == '1',
-      'anime': widget.currentCategories[1] == '1',
-      'people': widget.currentCategories[2] == '1',
-    };
-    
-    // Parse purity
-    purity = {
-      'sfw': widget.currentPurity[0] == '1',
-      'sketchy': widget.currentPurity[1] == '1',
-      'nsfw': widget.currentPurity.length > 2 && widget.currentPurity[2] == '1',
-    };
+    // Parse categories and purity
+    categories = parseCategoriesString(widget.currentCategories);
+    purity = parsePurityString(widget.currentPurity);
     
     sorting = widget.currentSorting;
     order = widget.currentOrder;
   }
   
-  String _buildCategoriesString() {
-    return '${categories['general']! ? '1' : '0'}'
-        '${categories['anime']! ? '1' : '0'}'
-        '${categories['people']! ? '1' : '0'}';
-  }
-  
-  String _buildPurityString() {
-    return '${purity['sfw']! ? '1' : '0'}'
-        '${purity['sketchy']! ? '1' : '0'}'
-        '${purity['nsfw']! ? '1' : '0'}';
-  }
+
   
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    return LiquidGlassLayer(
+      settings: LiquidGlassSettings(
+        thickness: 18,
+        blur: 8,
+        glassColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0x33000000)
+            : const Color(0x33FFFFFF),
       ),
-      child: Column(
+      child: LiquidGlass(
+        shape: const LiquidRoundedSuperellipse(borderRadius: 20),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -103,31 +92,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
           ),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 10,
-            children: [
-              FilterChip(
-                label: const Text('General'),
-                selected: categories['general']!,
-                onSelected: (value) {
-                  setState(() => categories['general'] = value);
-                },
-              ),
-              FilterChip(
-                label: const Text('Anime'),
-                selected: categories['anime']!,
-                onSelected: (value) {
-                  setState(() => categories['anime'] = value);
-                },
-              ),
-              FilterChip(
-                label: const Text('People'),
-                selected: categories['people']!,
-                onSelected: (value) {
-                  setState(() => categories['people'] = value);
-                },
-              ),
-            ],
+          CategoryChips(
+            categories: categories,
+            onChanged: (newCategories) {
+              setState(() => categories = newCategories);
+            },
           ),
           const SizedBox(height: 20),
           
@@ -140,32 +109,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
           ),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 10,
-            children: [
-              FilterChip(
-                label: const Text('SFW'),
-                selected: purity['sfw']!,
-                onSelected: (value) {
-                  setState(() => purity['sfw'] = value);
-                },
-              ),
-              FilterChip(
-                label: const Text('Sketchy'),
-                selected: purity['sketchy']!,
-                onSelected: (value) {
-                  setState(() => purity['sketchy'] = value);
-                },
-              ),
-              if (widget.apiKey != null && widget.apiKey!.isNotEmpty)
-                FilterChip(
-                  label: const Text('NSFW'),
-                  selected: purity['nsfw']!,
-                  onSelected: (value) {
-                    setState(() => purity['nsfw'] = value);
-                  },
-                ),
-            ],
+          PurityChips(
+            purity: purity,
+            showNsfw: widget.apiKey != null && widget.apiKey!.isNotEmpty,
+            onChanged: (newPurity) {
+              setState(() => purity = newPurity);
+            },
           ),
           const SizedBox(height: 20),
           
@@ -178,43 +127,64 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
           ),
           const SizedBox(height: 10),
-          DropdownButtonFormField<String>(
-            initialValue: sorting,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.1),
+                width: 1,
+              ),
             ),
-            items: const [
-              DropdownMenuItem(
-                value: AppConstants.sortDateAdded,
-                child: Text('Date Added'),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: DropdownButton<String>(
+              value: sorting,
+              isExpanded: true,
+              underline: const SizedBox(),
+              dropdownColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xE6000000)
+                  : const Color(0xE6FFFFFF),
+              borderRadius: BorderRadius.circular(12),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Theme.of(context).colorScheme.primary,
               ),
-              DropdownMenuItem(
-                value: AppConstants.sortRelevance,
-                child: Text('Relevance'),
-              ),
-              DropdownMenuItem(
-                value: AppConstants.sortRandom,
-                child: Text('Random'),
-              ),
-              DropdownMenuItem(
-                value: AppConstants.sortViews,
-                child: Text('Views'),
-              ),
-              DropdownMenuItem(
-                value: AppConstants.sortFavorites,
-                child: Text('Favorites'),
-              ),
-              DropdownMenuItem(
-                value: AppConstants.sortToplist,
-                child: Text('Toplist'),
-              ),
-            ],
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => sorting = value);
-              }
-            },
+              items: const [
+                DropdownMenuItem(
+                  value: AppConstants.sortDateAdded,
+                  child: Text('Date Added'),
+                ),
+                DropdownMenuItem(
+                  value: AppConstants.sortRelevance,
+                  child: Text('Relevance'),
+                ),
+                DropdownMenuItem(
+                  value: AppConstants.sortRandom,
+                  child: Text('Random'),
+                ),
+                DropdownMenuItem(
+                  value: AppConstants.sortViews,
+                  child: Text('Views'),
+                ),
+                DropdownMenuItem(
+                  value: AppConstants.sortFavorites,
+                  child: Text('Favorites'),
+                ),
+                DropdownMenuItem(
+                  value: AppConstants.sortToplist,
+                  child: Text('Toplist'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => sorting = value);
+                }
+              },
+            ),
           ),
           const SizedBox(height: 20),
           
@@ -228,6 +198,32 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           const SizedBox(height: 10),
           SegmentedButton<String>(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Theme.of(context).colorScheme.primary.withValues(alpha: 0.2);
+                  }
+                  return Colors.transparent;
+                },
+              ),
+              foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Theme.of(context).colorScheme.primary;
+                  }
+                  return Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+                },
+              ),
+              side: WidgetStateProperty.all(
+                BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+            ),
             segments: const [
               ButtonSegment(
                 value: AppConstants.orderDesc,
@@ -246,30 +242,46 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 30),
           
           // Apply button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                widget.onApply(
-                  _buildCategoriesString(),
-                  _buildPurityString(),
-                  sorting,
-                  order,
-                );
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: AppConstants.primaryColor,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text(
-                'Apply Filters',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          LiquidGlassLayer(
+            settings: LiquidGlassSettings(
+              thickness: 15,
+              blur: 8,
+              glassColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            ),
+            child: LiquidGlass(
+              shape: const LiquidRoundedSuperellipse(borderRadius: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    widget.onApply(
+                      buildCategoriesString(categories),
+                      buildPurityString(purity),
+                      sorting,
+                      order,
+                    );
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text(
+                    'Apply Filters',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }

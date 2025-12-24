@@ -5,6 +5,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vibration/vibration.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
@@ -13,6 +14,7 @@ import '../services/wallhaven_api.dart';
 import '../utils/download_manager.dart';
 import '../utils/wallpaper_setter.dart';
 import '../utils/theme_config.dart';
+import '../utils/glass_config.dart';
 import 'search_screen.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -379,245 +381,321 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Column(
         children: [
-          // Image viewer with hero animation
+          // Image viewer with hero animation and overlay buttons
           Expanded(
             flex: 3,
-            child: Hero(
-              tag: 'wallpaper_${widget.wallpaper.id}',
-              child: PhotoView(
-                imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered * 2,
-                backgroundDecoration: const BoxDecoration(
-                  color: Colors.black,
+            child: Stack(
+              children: [
+                // Image viewer
+                Hero(
+                  tag: 'wallpaper_${widget.wallpaper.id}',
+                  child: Container(
+                    color: Colors.black,
+                    child: PhotoView(
+                      imageProvider: CachedNetworkImageProvider(widget.wallpaper.path),
+                      minScale: PhotoViewComputedScale.contained,
+                      maxScale: PhotoViewComputedScale.covered * 2,
+                      initialScale: PhotoViewComputedScale.contained,
+                      backgroundDecoration: const BoxDecoration(
+                        color: Colors.black,
+                      ),
+                      loadingBuilder: (context, event) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Icon(Icons.error, color: Colors.red, size: 64),
+                      ),
+                    ),
+                  ),
                 ),
-                loadingBuilder: (context, event) => const Center(
-                  child: CircularProgressIndicator(),
+                
+                // Glass overlay buttons at bottom
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Row(
+                    children: [
+                      // Download button
+                      Expanded(
+                        child: Consumer<DownloadsProvider>(
+                          builder: (context, downloadsProvider, child) {
+                            final isDownloaded = downloadsProvider.isDownloaded(
+                              widget.wallpaper.id,
+                            );
+                            final isInQueue = downloadsProvider.isInQueue(
+                              widget.wallpaper.id,
+                            );
+                            final progress = downloadsProvider.getProgress(
+                              widget.wallpaper.id,
+                            );
+                            
+                            String buttonText;
+                            IconData buttonIcon;
+                            bool isDisabled = false;
+                            
+                            if (isDownloaded) {
+                              buttonText = 'Downloaded';
+                              buttonIcon = Icons.download_done;
+                            } else if (progress != null && progress > 0) {
+                              buttonText = '${(progress * 100).toInt()}%';
+                              buttonIcon = Icons.downloading;
+                              isDisabled = true;
+                            } else if (isInQueue) {
+                              buttonText = 'In Queue';
+                              buttonIcon = Icons.queue;
+                              isDisabled = true;
+                            } else {
+                              buttonText = 'Download';
+                              buttonIcon = Icons.download;
+                            }
+                            
+                            return LiquidGlassLayer(
+                              settings: LiquidGlassSettings(
+                                thickness: 20,
+                                blur: 12,
+                                glassColor: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0x66000000)
+                                    : const Color(0x66FFFFFF),
+                              ),
+                              child: LiquidGlass(
+                                shape: const LiquidRoundedSuperellipse(borderRadius: 24),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: isDisabled ? null : _downloadWallpaper,
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            buttonIcon,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            buttonText,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      
+                      // Set Wallpaper button
+                      Expanded(
+                        child: LiquidGlassLayer(
+                          settings: LiquidGlassSettings(
+                            thickness: 20,
+                            blur: 12,
+                            glassColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                          ),
+                          child: LiquidGlass(
+                            shape: const LiquidRoundedSuperellipse(borderRadius: 24),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _setWallpaper,
+                                borderRadius: BorderRadius.circular(24),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.wallpaper,
+                                        color: Theme.of(context).colorScheme.primary,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Set Wallpaper',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Icon(Icons.error, color: Colors.red, size: 64),
-                ),
-              ),
+              ],
             ),
           ),
           
-          // Details section
+          // Glass details section below the image
           Expanded(
             flex: 2,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
+            child: LiquidGlassLayer(
+              settings: LiquidGlassSettings(
+                thickness: 25,
+                blur: 15,
+                glassColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x55000000)
+                    : const Color(0x55FFFFFF),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stats row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem(
-                          Icons.remove_red_eye,
-                          '${widget.wallpaper.views}',
-                          'Views',
-                        ),
-                        _buildStatItem(
-                          Icons.favorite,
-                          '${widget.wallpaper.favorites}',
-                          'Favorites',
-                        ),
-                        _buildStatItem(
-                          Icons.aspect_ratio,
-                          widget.wallpaper.resolution,
-                          'Resolution',
-                        ),
-                      ],
+              child: LiquidGlass(
+                shape: const LiquidRoundedSuperellipse(borderRadius: 24),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
                     ),
-                    const SizedBox(height: 20),
-                    
-                    // Info
-                    _buildInfoRow('Category', widget.wallpaper.category),
-                    _buildInfoRow('Purity', widget.wallpaper.purity),
-                    _buildInfoRow('File Size', widget.wallpaper.fileSizeFormatted),
-                    _buildInfoRow('Ratio', widget.wallpaper.ratio),
-                    const SizedBox(height: 20),
-                    
-                    // Colors
-                    if (widget.wallpaper.colors.isNotEmpty) ...[
-                      const Text(
-                        'Colors',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Stats row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatItem(
+                              Icons.remove_red_eye,
+                              '${widget.wallpaper.views}',
+                              'Views',
+                            ),
+                            _buildStatItem(
+                              Icons.favorite,
+                              '${widget.wallpaper.favorites}',
+                              'Favorites',
+                            ),
+                            _buildStatItem(
+                              Icons.aspect_ratio,
+                              widget.wallpaper.resolution,
+                              'Resolution',
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: widget.wallpaper.colors.map((color) {
-                          return Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Color(
-                                int.parse('FF${color.substring(1)}', radix: 16),
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.white24),
+                        const SizedBox(height: 12),
+                        
+                        // Info
+                        _buildInfoRow('Category', widget.wallpaper.category),
+                        _buildInfoRow('Purity', widget.wallpaper.purity),
+                        _buildInfoRow('File Size', widget.wallpaper.fileSizeFormatted),
+                        _buildInfoRow('Ratio', widget.wallpaper.ratio),
+                        const SizedBox(height: 12),
+                        
+                        // Colors
+                        if (widget.wallpaper.colors.isNotEmpty) ...[
+                          const Text(
+                            'Colors',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                    
-                    // Tags
-                    if (_detailedWallpaper != null && _detailedWallpaper!.tags.isNotEmpty) ...[
-                      const Text(
-                        'Tags',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 4,
-                        runSpacing: 4,
-                        children: _detailedWallpaper!.tags.map((tag) {
-                          return ActionChip(
-                            label: Text(
-                              tag.name,
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                            avatar: Icon(
-                              Icons.tag,
-                              size: 14,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () {
-                              // Navigate to search screen with tag query
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SearchScreen(
-                                    initialQuery: tag.name,
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: widget.wallpaper.colors.map((color) {
+                              return Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Color(
+                                    int.parse('FF${color.substring(1)}', radix: 16),
                                   ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.white24),
                                 ),
                               );
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 20),
-                    ] else if (_isLoadingDetails) ...[
-                      const Text(
-                        'Tags',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const SizedBox(
-                        height: 32,
-                        child: Center(
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            }).toList(),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                    
-                    // Action buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Consumer<DownloadsProvider>(
-                            builder: (context, downloadsProvider, child) {
-                              final isDownloaded = downloadsProvider.isDownloaded(
-                                widget.wallpaper.id,
-                              );
-                              final isInQueue = downloadsProvider.isInQueue(
-                                widget.wallpaper.id,
-                              );
-                              final progress = downloadsProvider.getProgress(
-                                widget.wallpaper.id,
-                              );
-                              
-                              String buttonText;
-                              IconData buttonIcon;
-                              bool isDisabled = false;
-                              
-                              if (isDownloaded) {
-                                buttonText = 'Downloaded';
-                                buttonIcon = Icons.download_done;
-                              } else if (progress != null && progress > 0) {
-                                buttonText = '${(progress * 100).toInt()}%';
-                                buttonIcon = Icons.downloading;
-                                isDisabled = true;
-                              } else if (isInQueue) {
-                                buttonText = 'In Queue';
-                                buttonIcon = Icons.queue;
-                                isDisabled = true;
-                              } else {
-                                buttonText = 'Download';
-                                buttonIcon = Icons.download;
-                              }
-                              
-                              return Stack(
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: isDisabled ? null : _downloadWallpaper,
-                                    icon: Icon(buttonIcon),
-                                    label: Text(buttonText),
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                    ),
-                                  ),
-                                  if (progress != null && progress > 0)
-                                    Positioned.fill(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: LinearProgressIndicator(
-                                          value: progress,
-                                          backgroundColor: Colors.transparent,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Theme.of(context).primaryColor.withOpacity(0.3),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _setWallpaper,
-                            icon: const Icon(Icons.wallpaper),
-                            label: const Text('Set Wallpaper'),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                          const SizedBox(height: 20),
+                        ],
+                        
+                        // Tags
+                        if (_detailedWallpaper != null && _detailedWallpaper!.tags.isNotEmpty) ...[
+                          const Text(
+                            'Tags',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 4,
+                            children: _detailedWallpaper!.tags.map((tag) {
+                              return ActionChip(
+                                label: Text(
+                                  tag.name,
+                                  style: const TextStyle(fontSize: 11),
+                                ),
+                                avatar: Icon(
+                                  Icons.tag,
+                                  size: 14,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                                visualDensity: VisualDensity.compact,
+                                onPressed: () {
+                                  // Navigate to search screen with tag query
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SearchScreen(
+                                        initialQuery: tag.name,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                        ] else if (_isLoadingDetails) ...[
+                          const Text(
+                            'Tags',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const SizedBox(
+                            height: 32,
+                            child: Center(
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
