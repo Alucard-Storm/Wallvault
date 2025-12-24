@@ -1,6 +1,6 @@
 # WallVault
 
-A beautiful, feature-rich Flutter wallpaper app that lets you browse, search, download, and manage stunning wallpapers from Wallhaven.cc with Material You design and advanced filtering options.
+A beautiful, feature-rich Flutter wallpaper app with premium glass UI design that lets you browse, search, download, and manage stunning wallpapers from Wallhaven.cc with Material You theming and advanced filtering options.
 
 ## Features
 
@@ -42,10 +42,17 @@ A beautiful, feature-rich Flutter wallpaper app that lets you browse, search, do
 - Share downloaded wallpapers with other apps
 - Set downloaded wallpapers directly from the app
 
-### Customization
+### Premium Glass UI Design
+- **Liquid Glass Renderer**: Stunning glassmorphic UI with real-time blur and transparency effects
+- **Glass Components**:
+  - Glass navigation bar with smooth transitions
+  - Glass bottom sheets for filters and settings
+  - Glass cards for wallpaper details and downloads
+  - Glass search bar with frosted backdrop
+  - Glass loading states with shimmer effects
 - **Material You Dynamic Colors**: 
   - Automatically extract colors from your device wallpaper (Android 12+)
-  - System-wide color harmony
+  - System-wide color harmony with glass overlay effects
 - **Preset Theme Colors**: Choose from 8 Material Design color presets:
   - Indigo (Default)
   - Blue
@@ -55,16 +62,25 @@ A beautiful, feature-rich Flutter wallpaper app that lets you browse, search, do
   - Red
   - Pink
   - Purple
-- **Dark/Light Mode**: Toggle between dark and light themes
+- **Dark/Light Mode**: Toggle between dark and light themes with glass aesthetics
 - **Instant Theme Updates**: Changes apply immediately without restart
 - **Google Fonts Integration**: Beautiful typography with Inter font family
+- **Micro-animations**: Smooth hover effects and interactive elements
+
+### Wallpaper Details
+- **Color Palette Extraction**: View dominant colors from each wallpaper
+- **Tag Navigation**: Browse wallpapers by clicking on tags
+- **Detailed Information**: Resolution, file size, category, purity, and uploader info
+- **Interactive Elements**: Zoomable full-screen image viewer
+- **Glass Overlay Buttons**: Download and set wallpaper with premium glass design
 
 ### Settings
 - **API Key Configuration**: Enable NSFW content and higher rate limits
 - **Default Filters**: Set your preferred categories, purity, and sorting options
-- **Theme Customization**: Choose between system colors or preset themes
+- **Theme Customization**: Choose between system colors or preset themes with glass UI
 - **App Statistics**: View total favorites and downloads
 - **Persistent Settings**: All preferences saved locally
+- **Glass Settings Interface**: Premium glass cards for all settings sections
 
 ## Screenshots
 
@@ -125,11 +141,11 @@ To unlock NSFW content access and higher API rate limits:
 
 ### Searching & Filtering
 1. **Start a Search**:
-   - Tap the search icon (🔍) in the app bar
+   - Tap the search icon in the glass search bar
    - Enter your search query
    
 2. **Apply Filters**:
-   - Tap the filter icon to open the filter bottom sheet
+   - Tap the filter icon to open the glass filter bottom sheet
    - **Categories**: Select General, Anime, or People (multi-select supported)
    - **Purity**: Choose SFW, Sketchy, or NSFW (API key required for NSFW)
    - **Sorting**: Pick from Date Added, Relevance, Random, Views, Favorites, or Toplist
@@ -142,12 +158,20 @@ To unlock NSFW content access and higher API rate limits:
    - Configure your preferred categories, purity, and sorting
    - These will apply automatically when browsing
 
+4. **Search by Color**:
+   - Click on any color from a wallpaper's color palette
+   - Automatically search for wallpapers with similar colors
+
+5. **Search by Tag**:
+   - Tap on any tag in wallpaper details
+   - Browse wallpapers with the same tag
+
 ### Downloading Wallpapers
-1. Tap on any wallpaper to view full details
-2. Tap the **Download** button (⬇️)
+1. Tap on any wallpaper to view full details in glass overlay
+2. Tap the **Download** glass button
 3. Grant storage permission if prompted
 4. Wait for the download to complete (notification will appear)
-5. View downloaded wallpapers in the **Downloads** tab
+5. View downloaded wallpapers in the **Downloads** tab with glass cards
 
 ### Setting as Wallpaper
 1. Download the wallpaper first
@@ -156,10 +180,11 @@ To unlock NSFW content access and higher API rate limits:
 4. Use your device's native wallpaper setter to apply it
 
 ### Managing Favorites
-- **Add to Favorites**: Tap the heart icon (♡) on any wallpaper
-- **Remove from Favorites**: Tap the filled heart icon (♥) again
+- **Add to Favorites**: Tap the heart icon on any wallpaper
+- **Remove from Favorites**: Tap the filled heart icon again
 - **View Favorites**: Navigate to the **Favorites** tab to see all saved wallpapers
 - **Haptic Feedback**: Feel a subtle vibration when adding/removing favorites
+- **Glass UI**: Favorites displayed in premium glass cards
 
 ### Sharing Wallpapers
 1. Download the wallpaper first
@@ -187,6 +212,7 @@ To unlock NSFW content access and higher API rate limits:
 ### Architecture
 - **State Management**: Provider pattern for reactive state management
 - **API**: Wallhaven API v1 with comprehensive filtering support
+- **UI Framework**: Premium glass UI with liquid glass renderer
 - **Image Caching**: Advanced caching with `cached_network_image` and `flutter_cache_manager`
 - **Grid Layout**: Masonry grid with `flutter_staggered_grid_view`
 - **Image Viewing**: Zoomable image viewer with `photo_view`
@@ -194,7 +220,7 @@ To unlock NSFW content access and higher API rate limits:
   - `shared_preferences` for app settings and preferences
   - Local file system for downloaded wallpapers
   - Privacy-focused local storage (no cloud sync)
-- **Theming**: Material You dynamic colors with fallback to preset themes
+- **Theming**: Material You dynamic colors with glass overlay effects and fallback to preset themes
 - **Minimum SDK**: Android 32 (Android 12+) for full feature support
 
 ### Key Dependencies
@@ -204,6 +230,7 @@ To unlock NSFW content access and higher API rate limits:
 - `http` (^1.2.0): HTTP client for API requests
 
 #### UI & Theming
+- `liquid_glass_renderer` (^0.2.0-dev.4): Premium glass UI effects
 - `dynamic_color` (^1.7.0): Material You dynamic color support
 - `google_fonts` (^6.1.0): Typography with Inter font family
 - `flutter_staggered_grid_view` (^0.7.0): Masonry grid layout
@@ -252,13 +279,30 @@ lib/
 │   └── settings_screen.dart      # App settings and configuration
 ├── widgets/                       # Reusable widgets
 │   ├── wallpaper_grid_item.dart  # Grid item with shimmer loading
-│   └── filter_bottom_sheet.dart  # Advanced filter bottom sheet
+│   ├── filter_bottom_sheet.dart  # Advanced filter bottom sheet
+│   ├── glass_container.dart      # Glass container component
+│   ├── glass_nav_bar.dart        # Glass navigation bar
+│   ├── glass_bottom_sheet.dart   # Glass bottom sheet wrapper
+│   ├── glass_search_bar.dart     # Glass search bar
+│   ├── glass_settings_card.dart  # Glass settings card
+│   ├── glass_download_card.dart  # Glass download card
+│   ├── glass_loading.dart        # Glass loading states
+│   ├── glassmorphic_card.dart    # Glassmorphic card component
+│   ├── category_purity_chips.dart # Category and purity filter chips
+│   ├── empty_state_widget.dart   # Empty state display
+│   ├── error_state_widget.dart   # Error state display
+│   ├── loading_state_widget.dart # Loading state display
+│   └── shimmer_loading.dart      # Shimmer loading effect
 ├── services/                      # API services
 │   └── wallhaven_api.dart        # Wallhaven API client
 └── utils/                         # Utilities
     ├── constants.dart            # App constants and configurations
     ├── download_manager.dart     # Download handling with notifications
-    └── wallpaper_setter.dart     # Wallpaper setting utilities
+    ├── wallpaper_setter.dart     # Wallpaper setting utilities
+    ├── glass_config.dart         # Glass UI configuration
+    ├── theme_config.dart         # Theme configuration
+    ├── filter_utils.dart         # Filter utility functions
+    └── wallpaper_manager_channel.dart # Native wallpaper manager
 ```
 
 ## Known Issues
@@ -268,12 +312,13 @@ lib/
 ## Future Enhancements
 - [ ] Collections/Albums feature for organizing wallpapers
 - [ ] Wallpaper of the day widget
-- [ ] Color palette extraction and search
 - [ ] Offline mode with cached wallpapers
 - [ ] Export/Import favorites and settings
 - [ ] Multi-wallpaper download queue
 - [ ] Custom aspect ratio cropping
 - [ ] Wallpaper history tracking
+- [ ] Advanced glass UI customization options
+- [ ] Animated glass transitions between screens
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
