@@ -8,6 +8,7 @@ import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_settings_card.dart';
 import '../widgets/glass_empty_state.dart';
 import '../widgets/glass_pull_refresh.dart';
+import '../widgets/parallax_floating_background.dart';
 import 'downloaded_wallpaper_viewer.dart';
 
 class DownloadsScreen extends StatelessWidget {
@@ -45,8 +46,15 @@ class DownloadsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<DownloadsProvider>(
-        builder: (context, provider, child) {
+      body: Stack(
+        children: [
+          // Animated parallax floating background
+          const Positioned.fill(
+            child: ParallaxFloatingBackground(),
+          ),
+          // Downloads content
+          Consumer<DownloadsProvider>(
+            builder: (context, provider, child) {
           debugPrint('DownloadsScreen - isLoaded: ${provider.isLoaded}, downloads: ${provider.downloads.length}');
           
           if (!provider.isLoaded) {
@@ -194,7 +202,9 @@ class DownloadsScreen extends StatelessWidget {
               },
             ),
           );
-        },
+            },
+          ),
+        ],
       ),
     );
   }

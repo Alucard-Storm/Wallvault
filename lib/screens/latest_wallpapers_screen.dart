@@ -8,6 +8,7 @@ import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/error_state_widget.dart';
 import '../widgets/loading_state_widget.dart';
+import '../widgets/parallax_floating_background.dart';
 import 'search_screen.dart';
 import '../utils/constants.dart';
 
@@ -110,9 +111,16 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
           ),
         ],
       ),
-      body: ListenableBuilder(
-        listenable: _provider,
-        builder: (context, child) {
+      body: Stack(
+        children: [
+          // Animated parallax floating background
+          const Positioned.fill(
+            child: ParallaxFloatingBackground(),
+          ),
+          // Latest wallpapers content
+          ListenableBuilder(
+            listenable: _provider,
+            builder: (context, child) {
           if (_provider.wallpapers.isEmpty && _provider.isLoading) {
             return const LoadingStateWidget();
           }
@@ -160,7 +168,9 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
               },
             ),
           );
-        },
+            },
+          ),
+        ],
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/error_state_widget.dart';
 import '../widgets/loading_state_widget.dart';
+import '../widgets/parallax_floating_background.dart';
 import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -111,8 +112,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           ),
         ],
       ),
-      body: Consumer<WallpaperProvider>(
-        builder: (context, provider, child) {
+      body: Stack(
+        children: [
+          // Animated parallax floating background
+          const Positioned.fill(
+            child: ParallaxFloatingBackground(),
+          ),
+          // Home screen content
+          Consumer<WallpaperProvider>(
+            builder: (context, provider, child) {
           if (provider.wallpapers.isEmpty && provider.isLoading) {
             return const LoadingStateWidget();
           }
@@ -160,7 +168,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               },
             ),
           );
-        },
+            },
+          ),
+        ],
       ),
     );
   }

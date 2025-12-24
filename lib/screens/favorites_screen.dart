@@ -6,6 +6,7 @@ import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_empty_state.dart';
 import '../widgets/glass_pull_refresh.dart';
+import '../widgets/parallax_floating_background.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -55,8 +56,15 @@ class FavoritesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<FavoritesProvider>(
-        builder: (context, provider, child) {
+      body: Stack(
+        children: [
+          // Animated parallax floating background
+          const Positioned.fill(
+            child: ParallaxFloatingBackground(),
+          ),
+          // Favorites content
+          Consumer<FavoritesProvider>(
+            builder: (context, provider, child) {
           if (!provider.isLoaded) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -95,7 +103,9 @@ class FavoritesScreen extends StatelessWidget {
               },
             ),
           );
-        },
+            },
+          ),
+        ],
       ),
     );
   }

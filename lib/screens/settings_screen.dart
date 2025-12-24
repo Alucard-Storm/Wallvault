@@ -8,6 +8,7 @@ import '../providers/downloads_provider.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_settings_card.dart';
 import '../widgets/category_purity_chips.dart';
+import '../widgets/parallax_floating_background.dart';
 import '../utils/constants.dart';
 import '../utils/filter_utils.dart';
 
@@ -89,9 +90,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: GlassAppBar(
         title: 'Settings',
       ),
-      body: Consumer<SettingsProvider>(
-        builder: (context, settings, child) {
-          return ListView(
+      body: Stack(
+        children: [
+          // Animated parallax floating background
+          const Positioned.fill(
+            child: ParallaxFloatingBackground(),
+          ),
+          // Settings content
+          Consumer<SettingsProvider>(
+            builder: (context, settings, child) {
+              return ListView(
             padding: EdgeInsets.only(
               left: 16,
               right: 16,
@@ -499,8 +507,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 32),
             ],
-          );
-        },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
