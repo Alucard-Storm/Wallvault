@@ -112,17 +112,18 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Glass search bar
-          GlassSearchBar(
-            controller: _searchController,
-            hintText: 'Search wallpapers...',
-            autofocus: true,
-            onChanged: (_) => setState(() {}),
-            onSubmitted: _performSearch,
-            onClear: _clearSearch,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Glass search bar
+            GlassSearchBar(
+              controller: _searchController,
+              hintText: 'Search wallpapers...',
+              autofocus: true,
+              onChanged: (_) => setState(() {}),
+              onSubmitted: _performSearch,
+              onClear: _clearSearch,
+            ),
           
           // Search results
           Expanded(
@@ -239,6 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
