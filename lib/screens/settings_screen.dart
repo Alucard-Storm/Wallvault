@@ -108,7 +108,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             children: [
               // API Configuration Section
-              _buildSectionHeader('API Configuration'),
               GlassSettingsCard(
                 title: 'Wallhaven API Key',
                 children: [
@@ -162,7 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
               
               // Default Filters Section
-              _buildSectionHeader('Default Filters'),
               GlassSettingsCard(
                 title: 'Default Filters',
                 children: [
@@ -271,7 +269,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
               
               // Appearance Section
-              _buildSectionHeader('Appearance'),
               GlassSettingsCard(
                 title: 'Appearance',
                 children: [
@@ -405,7 +402,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
               
               // Storage & Cache Section
-              _buildSectionHeader('Storage & Cache'),
               GlassSettingsCard(
                 title: 'Storage & Cache',
                 children: [
@@ -438,7 +434,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
               
               // Data Management Section
-              _buildSectionHeader('Data Management'),
               GlassSettingsCard(
                 title: 'Data Management',
                 children: [
@@ -468,7 +463,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
               
               // About Section
-              _buildSectionHeader('About'),
               GlassSettingsCard(
                 title: 'About',
                 children: [
