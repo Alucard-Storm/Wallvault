@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,8 +7,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/downloads_provider.dart';
 import '../screens/detail_screen.dart';
 import '../utils/theme_config.dart';
+import '../utils/download_manager.dart';
 import 'shimmer_loading.dart';
 
 class WallpaperGridItem extends StatefulWidget {
@@ -69,11 +72,93 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
     );
   }
   
+  Future<void> _handleQuickDownload() async {
+    final downloadsProvider = Provider.of<DownloadsProvider>(context, listen: false);
+    
+    // Check if already downloaded
+    if (downloadsProvider.isDownloaded(widget.wallpaper.id)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Already downloaded'),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // Check if already in queue
+    if (downloadsProvider.isInQueue(widget.wallpaper.id)) {
+      return;
+    }
+    
+    try {
+      HapticFeedback.mediumImpact();
+      
+      // Add to queue tracking
+      downloadsProvider.addToQueue(widget.wallpaper.id);
+      
+      // Start download with progress tracking
+      final filePath = await DownloadManager.downloadWallpaper(
+        url: widget.wallpaper.path,
+        wallpaperId: widget.wallpaper.id,
+        onProgress: (progress) {
+          downloadsProvider.updateProgress(widget.wallpaper.id, progress);
+        },
+      );
+      
+      if (filePath != null) {
+        // Add to downloads list
+        await downloadsProvider.addDownload(
+          DownloadInfo(
+            wallpaperId: widget.wallpaper.id,
+            filePath: filePath,
+            downloadedAt: DateTime.now(),
+            thumbnailUrl: widget.wallpaper.thumbs,
+            resolution: widget.wallpaper.resolution,
+          ),
+        );
+        
+        if (mounted) {
+          HapticFeedback.heavyImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Download complete!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Quick download error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Download failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      downloadsProvider.removeFromQueue(widget.wallpaper.id);
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
-    return Consumer<FavoritesProvider>(
-      builder: (context, favoritesProvider, child) {
+    return Consumer2<FavoritesProvider, DownloadsProvider>(
+      builder: (context, favoritesProvider, downloadsProvider, child) {
         final isFavorite = favoritesProvider.isFavorite(widget.wallpaper.id);
+        final isDownloaded = downloadsProvider.isDownloaded(widget.wallpaper.id);
+        final downloadProgress = downloadsProvider.getProgress(widget.wallpaper.id);
+        final isInQueue = downloadsProvider.isInQueue(widget.wallpaper.id);
         
         return GestureDetector(
           onTapDown: _onTapDown,
@@ -240,6 +325,105 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                       ),
                     ),
+                    
+                    
+                    // Quick download button (top left) with Glass UI
+                    Positioned(
+                      top: ThemeConfig.spaceSmall,
+                      left: ThemeConfig.spaceSmall,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: isDownloaded 
+                                  ? Colors.green.withValues(alpha: 0.2)
+                                  : isInQueue
+                                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                                      : Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: isDownloaded ? null : _handleQuickDownload,
+                                borderRadius: BorderRadius.circular(20),
+                                child: Center(
+                                  child: isInQueue && downloadProgress != null
+                                      ? Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                value: downloadProgress,
+                                                strokeWidth: 2,
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  Theme.of(context).colorScheme.primary,
+                                                ),
+                                                backgroundColor: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                    .withValues(alpha: 0.2),
+                                              ),
+                                            ),
+                                            Text(
+                                              '${(downloadProgress * 100).toInt()}',
+                                              style: TextStyle(
+                                                color: Theme.of(context).colorScheme.primary,
+                                                fontSize: 8,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Icon(
+                                          isDownloaded 
+                                              ? Icons.check_circle
+                                              : Icons.download_rounded,
+                                          color: isDownloaded
+                                              ? Colors.green
+                                              : Colors.white,
+                                          size: 20,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                        .animate(
+                          target: isInQueue ? 1 : 0,
+                        )
+                        .scale(
+                          begin: const Offset(1.0, 1.0),
+                          end: const Offset(1.05, 1.05),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                        )
+                        .shimmer(
+                          duration: const Duration(milliseconds: 1500),
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                    ),
+                    
+                    
+                    
                     
                     // Glass info overlay (shown on long press)
                     if (_showGlassInfo)
