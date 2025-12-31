@@ -92,7 +92,7 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Latest Wallpapers',
+        title: const Text('Latest Wallpapers'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

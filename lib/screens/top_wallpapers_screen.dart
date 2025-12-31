@@ -91,7 +91,7 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen> with Automati
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Top Wallpapers',
+        title: const Text('Top Wallpapers'),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

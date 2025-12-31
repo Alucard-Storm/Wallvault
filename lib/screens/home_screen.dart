@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: widget.title,
+        title: Text(widget.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

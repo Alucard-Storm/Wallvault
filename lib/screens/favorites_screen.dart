@@ -16,7 +16,7 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Favorites',
+        title: const Text('Favorites'),
         actions: [
           Consumer<FavoritesProvider>(
             builder: (context, provider, child) {

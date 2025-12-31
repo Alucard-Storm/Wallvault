@@ -101,7 +101,7 @@ class FloatingGlassNavBar extends StatelessWidget {
 
 /// A glass app bar with frosted glass effect
 class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
+  final Widget title;
   final List<Widget>? actions;
   final Widget? leading;
   final bool centerTitle;
@@ -139,7 +139,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 0),
           child: AppBar(
-            title: Text(title),
+            title: title,
             actions: actions,
             leading: leading,
             centerTitle: centerTitle,

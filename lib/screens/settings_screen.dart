@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Settings',
+        title: const Text('Settings'),
       ),
       body: Stack(
         children: [

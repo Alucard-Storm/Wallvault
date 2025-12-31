@@ -104,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Search',
+        title: const Text('Search'),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
