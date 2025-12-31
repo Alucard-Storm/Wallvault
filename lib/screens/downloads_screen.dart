@@ -19,28 +19,106 @@ class DownloadsScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        title: 'Downloads',
+        title: Consumer<DownloadsProvider>(
+          builder: (context, provider, child) {
+            if (provider.isSelectionMode && provider.selectedCount > 0) {
+              return Text('${provider.selectedCount} selected');
+            }
+            return const Text('Downloads');
+          },
+        ),
         actions: [
           Consumer<DownloadsProvider>(
             builder: (context, provider, child) {
               if (provider.downloads.isEmpty) return const SizedBox.shrink();
               
-              return IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () async {
-                  final result = await GlassDialog.show(
-                    context: context,
-                    title: 'Clear Downloads',
-                    content: 'Are you sure you want to clear the downloads list? '
-                        'This will not delete the files from your device.',
-                    confirmText: 'Clear',
-                    cancelText: 'Cancel',
-                  );
-                  
-                  if (result == true && context.mounted) {
-                    provider.clearDownloads();
-                  }
-                },
+              // Selection mode actions
+              if (provider.isSelectionMode) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Select All button
+                    IconButton(
+                      icon: Icon(
+                        provider.selectedCount == provider.downloads.length
+                            ? Icons.deselect
+                            : Icons.select_all,
+                      ),
+                      tooltip: provider.selectedCount == provider.downloads.length
+                          ? 'Deselect All'
+                          : 'Select All',
+                      onPressed: () {
+                        if (provider.selectedCount == provider.downloads.length) {
+                          provider.clearSelection();
+                        } else {
+                          provider.selectAll();
+                        }
+                      },
+                    ),
+                    // Delete selected button
+                    if (provider.selectedCount > 0)
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        tooltip: 'Delete Selected',
+                        onPressed: () async {
+                          final result = await GlassDialog.show(
+                            context: context,
+                            title: 'Delete Selected',
+                            content: 'Are you sure you want to delete ${provider.selectedCount} selected download(s)? '
+                                'This will not delete the files from your device.',
+                            confirmText: 'Delete',
+                            cancelText: 'Cancel',
+                          );
+                          
+                          if (result == true && context.mounted) {
+                            provider.deleteSelected();
+                          }
+                        },
+                      ),
+                    // Cancel selection mode
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Cancel',
+                      onPressed: () {
+                        provider.exitSelectionMode();
+                      },
+                    ),
+                  ],
+                );
+              }
+              
+              // Normal mode actions
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Enter selection mode
+                  IconButton(
+                    icon: const Icon(Icons.checklist),
+                    tooltip: 'Select',
+                    onPressed: () {
+                      provider.toggleSelectionMode();
+                    },
+                  ),
+                  // Clear all downloads
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: 'Clear All',
+                    onPressed: () async {
+                      final result = await GlassDialog.show(
+                        context: context,
+                        title: 'Clear Downloads',
+                        content: 'Are you sure you want to clear the downloads list? '
+                            'This will not delete the files from your device.',
+                        confirmText: 'Clear',
+                        cancelText: 'Cancel',
+                      );
+                      
+                      if (result == true && context.mounted) {
+                        provider.clearDownloads();
+                      }
+                    },
+                  ),
+                ],
               );
             },
           ),
@@ -90,17 +168,24 @@ class DownloadsScreen extends StatelessWidget {
               itemCount: provider.downloads.length,
               itemBuilder: (context, index) {
                 final download = provider.downloads[index];
+                final isSelected = provider.isSelected(download.wallpaperId);
                 
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DownloadedWallpaperViewer(
-                          downloadInfo: download,
+                    // In selection mode, toggle selection
+                    if (provider.isSelectionMode) {
+                      provider.toggleSelection(download.wallpaperId);
+                    } else {
+                      // In normal mode, navigate to viewer
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DownloadedWallpaperViewer(
+                            downloadInfo: download,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                   child: AspectRatio(
                     aspectRatio: 3 / 4, // Default aspect ratio for downloads
@@ -114,6 +199,12 @@ class DownloadsScreen extends StatelessWidget {
                           elevation: 4,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
+                            side: provider.isSelectionMode && isSelected
+                                ? BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 3,
+                                  )
+                                : BorderSide.none,
                           ),
                           child: Stack(
                             fit: StackFit.expand,
@@ -140,6 +231,12 @@ class DownloadsScreen extends StatelessWidget {
                                     Icons.image_not_supported,
                                     color: Colors.grey,
                                   ),
+                                ),
+                              
+                              // Selection overlay
+                              if (provider.isSelectionMode && isSelected)
+                                Container(
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                 ),
                               
                               // Gradient overlay
@@ -192,6 +289,28 @@ class DownloadsScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              
+                              // Selection checkbox
+                              if (provider.isSelectionMode)
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.6),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      isSelected
+                                          ? Icons.check_circle
+                                          : Icons.circle_outlined,
+                                      color: isSelected
+                                          ? Theme.of(context).colorScheme.primary
+                                          : Colors.white,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         );

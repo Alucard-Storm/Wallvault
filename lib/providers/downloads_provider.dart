@@ -44,9 +44,14 @@ class DownloadsProvider with ChangeNotifier {
   bool _isLoaded = false;
   final Map<String, double> _downloadProgress = {};
   final Set<String> _queuedDownloads = {};
+  bool _isSelectionMode = false;
+  final Set<String> _selectedDownloads = {};
   
   List<DownloadInfo> get downloads => _downloads;
   bool get isLoaded => _isLoaded;
+  bool get isSelectionMode => _isSelectionMode;
+  Set<String> get selectedDownloads => _selectedDownloads;
+  int get selectedCount => _selectedDownloads.length;
   
   // Get download progress for a wallpaper
   double? getProgress(String wallpaperId) {
@@ -139,9 +144,64 @@ class DownloadsProvider with ChangeNotifier {
     }
   }
   
+  // Toggle selection mode
+  void toggleSelectionMode() {
+    _isSelectionMode = !_isSelectionMode;
+    if (!_isSelectionMode) {
+      _selectedDownloads.clear();
+    }
+    notifyListeners();
+  }
+  
+  // Exit selection mode
+  void exitSelectionMode() {
+    _isSelectionMode = false;
+    _selectedDownloads.clear();
+    notifyListeners();
+  }
+  
+  // Toggle selection for a download
+  void toggleSelection(String wallpaperId) {
+    if (_selectedDownloads.contains(wallpaperId)) {
+      _selectedDownloads.remove(wallpaperId);
+    } else {
+      _selectedDownloads.add(wallpaperId);
+    }
+    notifyListeners();
+  }
+  
+  // Check if a download is selected
+  bool isSelected(String wallpaperId) {
+    return _selectedDownloads.contains(wallpaperId);
+  }
+  
+  // Select all downloads
+  void selectAll() {
+    _selectedDownloads.clear();
+    _selectedDownloads.addAll(_downloads.map((d) => d.wallpaperId));
+    notifyListeners();
+  }
+  
+  // Clear selection
+  void clearSelection() {
+    _selectedDownloads.clear();
+    notifyListeners();
+  }
+  
+  // Delete selected downloads
+  Future<void> deleteSelected() async {
+    _downloads.removeWhere((d) => _selectedDownloads.contains(d.wallpaperId));
+    _selectedDownloads.clear();
+    _isSelectionMode = false;
+    await _saveDownloads();
+    notifyListeners();
+  }
+  
   // Clear all downloads
   Future<void> clearDownloads() async {
     _downloads.clear();
+    _selectedDownloads.clear();
+    _isSelectionMode = false;
     await _saveDownloads();
     notifyListeners();
   }
