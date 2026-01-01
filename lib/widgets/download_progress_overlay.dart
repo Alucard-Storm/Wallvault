@@ -23,8 +23,7 @@ class DownloadProgressOverlay extends StatelessWidget {
         color: Colors.black.withOpacity(0.6),
       ),
       child: LiquidGlass(
-        blur: 20,
-        opacity: 0.3,
+        shape: LiquidRoundedSuperellipse(borderRadius: 30),
         child: Center(
           child: isComplete
               ? _buildCompleteIndicator()

@@ -109,8 +109,7 @@ class FakeGlassContainer extends StatelessWidget {
             : Colors.white.withOpacity(0.3));
     
     Widget glassWidget = FakeGlass(
-      borderRadius: BorderRadius.circular(borderRadius),
-      backgroundColor: bgColor,
+      shape: LiquidRoundedSuperellipse(borderRadius: 30),
       child: Container(
         width: width,
         height: height,

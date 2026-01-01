@@ -108,8 +108,7 @@ class _GlassSkeletonLoaderState extends State<GlassSkeletonLoader>
                 ? BorderRadius.circular(widget.width / 2)
                 : (widget.borderRadius ?? BorderRadius.zero),
             child: LiquidGlass(
-              blur: 10,
-              opacity: _opacityAnimation.value * 0.3,
+              shape: LiquidRoundedSuperellipse(borderRadius: 30),
               child: Container(),
             ),
           ),
