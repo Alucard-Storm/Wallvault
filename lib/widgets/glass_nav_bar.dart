@@ -101,14 +101,16 @@ class FloatingGlassNavBar extends StatelessWidget {
 
 /// A glass app bar with frosted glass effect
 class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget title;
+  final String? appName;
+  final String screenName;
   final List<Widget>? actions;
   final Widget? leading;
   final bool centerTitle;
   
   const GlassAppBar({
     super.key,
-    required this.title,
+    this.appName = 'WallVault',
+    required this.screenName,
     this.actions,
     this.leading,
     this.centerTitle = false,
@@ -139,7 +141,29 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 0),
           child: AppBar(
-            title: title,
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+              children: [
+                if (appName != null)
+                  Text(
+                    appName!,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                Text(
+                  screenName,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
             actions: actions,
             leading: leading,
             centerTitle: centerTitle,

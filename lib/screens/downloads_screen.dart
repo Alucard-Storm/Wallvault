@@ -16,18 +16,17 @@ class DownloadsScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: GlassAppBar(
-        title: Consumer<DownloadsProvider>(
-          builder: (context, provider, child) {
-            if (provider.isSelectionMode && provider.selectedCount > 0) {
-              return Text('${provider.selectedCount} selected');
-            }
-            return const Text('Downloads');
-          },
-        ),
-        actions: [
+    return Consumer<DownloadsProvider>(
+      builder: (context, provider, child) {
+        final screenName = provider.isSelectionMode && provider.selectedCount > 0
+            ? '${provider.selectedCount} selected'
+            : 'Downloads';
+        
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: GlassAppBar(
+            screenName: screenName,
+            actions: [
           Consumer<DownloadsProvider>(
             builder: (context, provider, child) {
               if (provider.downloads.isEmpty) return const SizedBox.shrink();
@@ -325,6 +324,8 @@ class DownloadsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+      },
     );
   }
 }
