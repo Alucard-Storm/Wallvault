@@ -6,7 +6,7 @@ import 'providers/wallpaper_provider.dart';
 import 'providers/favorites_provider.dart';
 import 'providers/downloads_provider.dart';
 import 'providers/settings_provider.dart';
-import 'screens/main_navigation.dart';
+import 'screens/splash_screen.dart';
 import 'utils/constants.dart';
 
 void main() async {
@@ -187,7 +187,7 @@ class WallVaultApp extends StatelessWidget {
                   ),
                 ),
                 
-                home: const MainNavigation(),
+                home: const SplashScreen(),
               );
             },
           );
