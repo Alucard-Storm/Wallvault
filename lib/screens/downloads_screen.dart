@@ -161,7 +161,7 @@ class DownloadsScreen extends StatelessWidget {
               padding: EdgeInsets.only(
                 left: 8,
                 right: 8,
-                top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+                top: 8 + MediaQuery.of(context).padding.top,
                 bottom: 100,
               ),
               itemCount: provider.downloads.length,

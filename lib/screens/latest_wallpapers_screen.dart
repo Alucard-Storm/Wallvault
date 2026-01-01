@@ -148,7 +148,7 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
               padding: EdgeInsets.only(
                 left: 8,
                 right: 8,
-                top: 8 + kToolbarHeight + MediaQuery.of(context).padding.top,
+                top: 8 + MediaQuery.of(context).padding.top,
                 bottom: 100,
               ),
               itemCount: _provider.wallpapers.length + (_provider.hasMore ? 1 : 0),

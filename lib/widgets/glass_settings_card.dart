@@ -7,14 +7,14 @@ class GlassSettingsCard extends StatelessWidget {
   final String title;
   final List<Widget> children;
   final EdgeInsetsGeometry? padding;
-  
+
   const GlassSettingsCard({
     super.key,
     required this.title,
     required this.children,
     this.padding,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -31,6 +31,12 @@ class GlassSettingsCard extends StatelessWidget {
           shape: const LiquidRoundedSuperellipse(borderRadius: 16),
           child: Container(
             padding: padding ?? const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xCC0A0E21)
+                  : const Color(0xCCF5F5F5),
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,14 +63,14 @@ class GlassDialog extends StatelessWidget {
   final String title;
   final String content;
   final List<Widget> actions;
-  
+
   const GlassDialog({
     super.key,
     required this.title,
     required this.content,
     required this.actions,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -101,7 +107,9 @@ class GlassDialog extends StatelessWidget {
                   content,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -116,7 +124,7 @@ class GlassDialog extends StatelessWidget {
       ),
     );
   }
-  
+
   static Future<bool?> show({
     required BuildContext context,
     required String title,
