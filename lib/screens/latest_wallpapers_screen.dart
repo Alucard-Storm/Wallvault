@@ -14,24 +14,25 @@ import '../utils/constants.dart';
 
 class LatestWallpapersScreen extends StatefulWidget {
   const LatestWallpapersScreen({super.key});
-  
+
   @override
   State<LatestWallpapersScreen> createState() => _LatestWallpapersScreenState();
 }
 
-class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with AutomaticKeepAliveClientMixin {
+class _LatestWallpapersScreenState extends State<LatestWallpapersScreen>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   late WallpaperProvider _provider;
-  
+
   @override
   bool get wantKeepAlive => true;
-  
+
   @override
   void initState() {
     super.initState();
     _provider = WallpaperProvider();
     _provider.updateFilters(sorting: AppConstants.sortDateAdded);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.addListener(_onScroll);
       // Sync API key from settings to this provider instance
@@ -39,29 +40,29 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
       _provider.setApiKey(settings.apiKey);
     });
   }
-  
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-  
+
   void _onScroll() {
-    if (_scrollController.position.pixels >= 
+    if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.8) {
       if (!_provider.isLoading && _provider.hasMore) {
         _provider.loadWallpapers();
       }
     }
   }
-  
+
   Future<void> _onRefresh() async {
     await _provider.loadWallpapers(refresh: true);
   }
-  
+
   void _showFilters() {
     final settings = context.read<SettingsProvider>();
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -71,24 +72,26 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
         currentPurity: _provider.purity,
         currentSorting: _provider.sorting,
         currentOrder: _provider.order,
+        currentRatios: _provider.ratios,
         apiKey: settings.apiKey,
-        onApply: (categories, purity, sorting, order) {
+        onApply: (categories, purity, sorting, order, ratios) {
           // Keep sorting as date_added (latest first), only update categories and purity
           _provider.updateFilters(
             categories: categories,
             purity: purity,
             sorting: AppConstants.sortDateAdded,
             order: AppConstants.orderDesc,
+            ratios: ratios,
           );
         },
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
@@ -99,9 +102,7 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SearchScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
           ),
@@ -114,60 +115,57 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen> with Au
       body: Stack(
         children: [
           // Animated parallax floating background
-          const Positioned.fill(
-            child: ParallaxFloatingBackground(),
-          ),
+          const Positioned.fill(child: ParallaxFloatingBackground()),
           // Latest wallpapers content
           ListenableBuilder(
             listenable: _provider,
             builder: (context, child) {
-          if (_provider.wallpapers.isEmpty && _provider.isLoading) {
-            return const LoadingStateWidget();
-          }
-          
-          if (_provider.error != null && _provider.wallpapers.isEmpty) {
-            return ErrorStateWidget(
-              message: _provider.error!,
-              onRetry: _onRefresh,
-            );
-          }
-          
-          if (_provider.wallpapers.isEmpty) {
-            return const Center(
-              child: Text('No wallpapers found'),
-            );
-          }
-          
-          return RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: MasonryGridView.count(
-              controller: _scrollController,
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              padding: EdgeInsets.only(
-                left: 8,
-                right: 8,
-                top: 8 + MediaQuery.of(context).padding.top,
-                bottom: 100,
-              ),
-              itemCount: _provider.wallpapers.length + (_provider.hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index >= _provider.wallpapers.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                
-                return WallpaperGridItem(
-                  wallpaper: _provider.wallpapers[index],
+              if (_provider.wallpapers.isEmpty && _provider.isLoading) {
+                return const LoadingStateWidget();
+              }
+
+              if (_provider.error != null && _provider.wallpapers.isEmpty) {
+                return ErrorStateWidget(
+                  message: _provider.error!,
+                  onRetry: _onRefresh,
                 );
-              },
-            ),
-          );
+              }
+
+              if (_provider.wallpapers.isEmpty) {
+                return const Center(child: Text('No wallpapers found'));
+              }
+
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: MasonryGridView.count(
+                  controller: _scrollController,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    right: 8,
+                    top: 8 + MediaQuery.of(context).padding.top,
+                    bottom: 100,
+                  ),
+                  itemCount:
+                      _provider.wallpapers.length + (_provider.hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= _provider.wallpapers.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    return WallpaperGridItem(
+                      wallpaper: _provider.wallpapers[index],
+                    );
+                  },
+                ),
+              );
             },
           ),
         ],
