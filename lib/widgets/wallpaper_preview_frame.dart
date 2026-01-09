@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Wallpaper preview frame showing how it looks on home/lock screen
 class WallpaperPreviewFrame extends StatefulWidget {
   final String imageUrl;
   final VoidCallback? onClose;
-  
+
   const WallpaperPreviewFrame({
     super.key,
     required this.imageUrl,
@@ -20,19 +19,19 @@ class WallpaperPreviewFrame extends StatefulWidget {
 class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
-  
+
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +61,7 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
       ),
     );
   }
-  
+
   Widget _buildPreview({required bool isLockScreen}) {
     return Center(
       child: AspectRatio(
@@ -89,13 +88,13 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
                   imageUrl: widget.imageUrl,
                   fit: BoxFit.cover,
                 ),
-                
+
                 // Phone UI overlay
                 if (isLockScreen)
                   _buildLockScreenOverlay()
                 else
                   _buildHomeScreenOverlay(),
-                
+
                 // Phone notch
                 Positioned(
                   top: 0,
@@ -119,12 +118,12 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
       ),
     );
   }
-  
+
   Widget _buildLockScreenOverlay() {
     final now = DateTime.now();
     final hour = now.hour.toString().padLeft(2, '0');
     final minute = now.minute.toString().padLeft(2, '0');
-    
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -152,10 +151,7 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
           // Date
           Text(
             _getFormattedDate(now),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
           const Spacer(),
           // Bottom indicators
@@ -173,17 +169,14 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
       ),
     );
   }
-  
+
   Widget _buildHomeScreenOverlay() {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.transparent,
-            Colors.black.withOpacity(0.2),
-          ],
+          colors: [Colors.transparent, Colors.black.withOpacity(0.2)],
         ),
       ),
       child: Column(
@@ -205,7 +198,11 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
                 ),
                 Row(
                   children: const [
-                    Icon(Icons.signal_cellular_4_bar, color: Colors.white, size: 16),
+                    Icon(
+                      Icons.signal_cellular_4_bar,
+                      color: Colors.white,
+                      size: 16,
+                    ),
                     SizedBox(width: 4),
                     Icon(Icons.wifi, color: Colors.white, size: 16),
                     SizedBox(width: 4),
@@ -224,10 +221,7 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
               crossAxisCount: 4,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
-              children: List.generate(
-                12,
-                (index) => _buildAppIcon(),
-              ),
+              children: List.generate(12, (index) => _buildAppIcon()),
             ),
           ),
           const SizedBox(height: 20),
@@ -245,17 +239,14 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(
-                4,
-                (index) => _buildAppIcon(),
-              ),
+              children: List.generate(4, (index) => _buildAppIcon()),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildLockIcon(IconData icon) {
     return Container(
       width: 50,
@@ -263,36 +254,47 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.2),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.5),
-          width: 2,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
       ),
-      child: Icon(
-        icon,
-        color: Colors.white,
-        size: 24,
-      ),
+      child: Icon(icon, color: Colors.white, size: 24),
     );
   }
-  
+
   Widget _buildAppIcon() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.4),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
       ),
     );
   }
-  
+
   String _getFormattedDate(DateTime date) {
-    final weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
+    final weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
     return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}';
   }
 }

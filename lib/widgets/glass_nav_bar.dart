@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import '../utils/glass_config.dart';
 
 /// A floating glass navigation bar with iOS 18-style design
 class FloatingGlassNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
   final List<NavigationDestination> destinations;
-  
+
   const FloatingGlassNavBar({
     super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
     required this.destinations,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -49,7 +48,7 @@ class FloatingGlassNavBar extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildNavItem(
     BuildContext context,
     NavigationDestination destination,
@@ -57,8 +56,10 @@ class FloatingGlassNavBar extends StatelessWidget {
     bool isSelected,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final color = isSelected ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.6);
-    
+    final color = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurface.withOpacity(0.6);
+
     return Expanded(
       child: InkWell(
         onTap: () => onDestinationSelected(index),
@@ -70,12 +71,9 @@ class FloatingGlassNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconTheme(
-                data: IconThemeData(
-                  color: color,
-                  size: 24,
-                ),
-                child: isSelected 
-                    ? (destination.selectedIcon ?? destination.icon) 
+                data: IconThemeData(color: color, size: 24),
+                child: isSelected
+                    ? (destination.selectedIcon ?? destination.icon)
                     : destination.icon,
               ),
               const SizedBox(height: 2),
@@ -106,7 +104,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final bool centerTitle;
-  
+
   const GlassAppBar({
     super.key,
     this.appName = 'WallVault',
@@ -115,10 +113,10 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.centerTitle = false,
   });
-  
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -143,7 +141,9 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: AppBar(
             title: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+              crossAxisAlignment: centerTitle
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
               children: [
                 if (appName != null)
                   Text(
@@ -159,7 +159,9 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
                   ),
                 ),
               ],

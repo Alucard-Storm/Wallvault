@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import '../utils/glass_config.dart';
 
 /// A glass card for settings sections
 class GlassSettingsCard extends StatelessWidget {

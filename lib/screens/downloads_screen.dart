@@ -144,7 +144,7 @@ class DownloadsScreen extends StatelessWidget {
             return GlassEmptyState.downloads(
               onBrowse: () {
                 // Navigate to top wallpapers tab
-                DefaultTabController.of(context)?.animateTo(0);
+                DefaultTabController.of(context).animateTo(0);
               },
             );
           }

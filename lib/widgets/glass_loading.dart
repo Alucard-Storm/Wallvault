@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import '../utils/glass_config.dart';
 
 /// A glass loading indicator with frosted glass effect
 class GlassLoadingIndicator extends StatelessWidget {
   final String? message;
   final double size;
-  
-  const GlassLoadingIndicator({
-    super.key,
-    this.message,
-    this.size = 80,
-  });
-  
+
+  const GlassLoadingIndicator({super.key, this.message, this.size = 80});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -51,7 +46,9 @@ class GlassLoadingIndicator extends StatelessWidget {
                     message!,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.8),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -71,7 +68,7 @@ class GlassEmptyState extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? action;
-  
+
   const GlassEmptyState({
     super.key,
     required this.icon,
@@ -79,7 +76,7 @@ class GlassEmptyState extends StatelessWidget {
     this.subtitle,
     this.action,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -103,7 +100,9 @@ class GlassEmptyState extends StatelessWidget {
                   Icon(
                     icon,
                     size: 64,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.6),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -120,15 +119,14 @@ class GlassEmptyState extends StatelessWidget {
                       subtitle!,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ],
-                  if (action != null) ...[
-                    const SizedBox(height: 24),
-                    action!,
-                  ],
+                  if (action != null) ...[const SizedBox(height: 24), action!],
                 ],
               ),
             ),

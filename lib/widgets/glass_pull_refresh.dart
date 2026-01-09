@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import '../utils/animation_config.dart';
 
 /// Custom pull-to-refresh indicator with glass styling
 class GlassPullRefresh extends StatelessWidget {
   final Widget child;
   final Future<void> Function() onRefresh;
-  
+
   const GlassPullRefresh({
     super.key,
     required this.child,
@@ -31,11 +30,8 @@ class GlassPullRefresh extends StatelessWidget {
 /// Glass refresh indicator widget
 class GlassRefreshIndicator extends StatefulWidget {
   final double progress; // 0.0 to 1.0
-  
-  const GlassRefreshIndicator({
-    super.key,
-    required this.progress,
-  });
+
+  const GlassRefreshIndicator({super.key, required this.progress});
 
   @override
   State<GlassRefreshIndicator> createState() => _GlassRefreshIndicatorState();
@@ -44,7 +40,7 @@ class GlassRefreshIndicator extends StatefulWidget {
 class _GlassRefreshIndicatorState extends State<GlassRefreshIndicator>
     with SingleTickerProviderStateMixin {
   late AnimationController _rotationController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -53,17 +49,17 @@ class _GlassRefreshIndicatorState extends State<GlassRefreshIndicator>
       duration: const Duration(milliseconds: 1000),
     )..repeat();
   }
-  
+
   @override
   void dispose() {
     _rotationController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isRefreshing = widget.progress >= 1.0;
-    
+
     return LiquidGlassLayer(
       child: Container(
         width: 60,
@@ -78,10 +74,7 @@ class _GlassRefreshIndicatorState extends State<GlassRefreshIndicator>
               Colors.white.withOpacity(0.1),
             ],
           ),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.3),
-            width: 2,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.3),

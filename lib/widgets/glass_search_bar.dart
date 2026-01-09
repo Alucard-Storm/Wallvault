@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
-import '../utils/glass_config.dart';
 
 /// A floating glass search bar with premium frosted glass effect
 class GlassSearchBar extends StatelessWidget {
@@ -10,7 +9,7 @@ class GlassSearchBar extends StatelessWidget {
   final VoidCallback? onSubmitted;
   final VoidCallback? onClear;
   final bool autofocus;
-  
+
   const GlassSearchBar({
     super.key,
     required this.controller,
@@ -20,7 +19,7 @@ class GlassSearchBar extends StatelessWidget {
     this.onClear,
     this.autofocus = false,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -42,7 +41,9 @@ class GlassSearchBar extends StatelessWidget {
               children: [
                 Icon(
                   Icons.search,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -50,7 +51,9 @@ class GlassSearchBar extends StatelessWidget {
                     controller: controller,
                     autofocus: autofocus,
                     onChanged: onChanged,
-                    onSubmitted: onSubmitted != null ? (_) => onSubmitted!() : null,
+                    onSubmitted: onSubmitted != null
+                        ? (_) => onSubmitted!()
+                        : null,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
@@ -58,7 +61,9 @@ class GlassSearchBar extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: hintText,
                       hintStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.4),
                       ),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -69,11 +74,15 @@ class GlassSearchBar extends StatelessWidget {
                 if (controller.text.isNotEmpty)
                   IconButton(
                     icon: const Icon(Icons.clear),
-                    onPressed: onClear ?? () {
-                      controller.clear();
-                      if (onChanged != null) onChanged!('');
-                    },
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    onPressed:
+                        onClear ??
+                        () {
+                          controller.clear();
+                          if (onChanged != null) onChanged!('');
+                        },
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                   ),
               ],
             ),

@@ -75,7 +75,7 @@ class FavoritesScreen extends StatelessWidget {
             return GlassEmptyState.favorites(
               onBrowse: () {
                 // Navigate to top wallpapers tab
-                DefaultTabController.of(context)?.animateTo(0);
+                DefaultTabController.of(context).animateTo(0);
               },
             );
           }
