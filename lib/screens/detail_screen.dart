@@ -345,10 +345,9 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Future<void> _openInBrowser() async {
+    HapticManager.lightTap();
     final url = Uri.parse(widget.wallpaper.url);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+    await launchUrl(url, mode: LaunchMode.platformDefault);
   }
 
   @override
