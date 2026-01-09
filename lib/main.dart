@@ -43,19 +43,25 @@ class WallVaultApp extends StatelessWidget {
               context.read<WallpaperProvider>().setApiKey(settings.apiKey);
             });
           }
-          
+
           // Use default colors if settings not loaded yet
-          final primaryColor = settings.isLoaded ? settings.primaryColor : AppConstants.primaryColor;
-          final accentColor = settings.isLoaded ? settings.accentColor : AppConstants.accentColor;
+          final primaryColor = settings.isLoaded
+              ? settings.primaryColor
+              : AppConstants.primaryColor;
+          final accentColor = settings.isLoaded
+              ? settings.accentColor
+              : AppConstants.accentColor;
           final isDark = settings.isLoaded ? settings.isDarkTheme : true;
-          
+
           return DynamicColorBuilder(
             builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
               // Use Material You colors if available AND user wants them
               ColorScheme lightColorScheme;
               ColorScheme darkColorScheme;
-              
-              if (settings.useSystemColors && lightDynamic != null && darkDynamic != null) {
+
+              if (settings.useSystemColors &&
+                  lightDynamic != null &&
+                  darkDynamic != null) {
                 // Material You colors available and enabled
                 lightColorScheme = lightDynamic.harmonized();
                 darkColorScheme = darkDynamic.harmonized();
@@ -72,20 +78,24 @@ class WallVaultApp extends StatelessWidget {
                   surface: AppConstants.surfaceColor,
                 );
               }
-              
+
               return MaterialApp(
-                key: ValueKey('${settings.isLoaded ? settings.themeColor : "default"}_$isDark'),
+                key: ValueKey(
+                  '${settings.isLoaded ? settings.themeColor : "default"}_$isDark',
+                ),
                 title: 'WallVault',
                 debugShowCheckedModeBanner: false,
                 themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-                
+
                 // Dark Theme
                 darkTheme: ThemeData(
                   useMaterial3: true,
                   brightness: Brightness.dark,
                   colorScheme: darkColorScheme,
                   scaffoldBackgroundColor: AppConstants.backgroundColor,
-                  textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+                  textTheme: GoogleFonts.robotoCondensedTextTheme(
+                    ThemeData.dark().textTheme,
+                  ),
                   cardTheme: CardThemeData(
                     color: AppConstants.cardColor,
                     elevation: 4,
@@ -104,7 +114,10 @@ class WallVaultApp extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                   navigationBarTheme: NavigationBarThemeData(
@@ -112,7 +125,7 @@ class WallVaultApp extends StatelessWidget {
                     elevation: 8,
                     height: 70,
                     labelTextStyle: WidgetStateProperty.all(
-                      GoogleFonts.inter(
+                      GoogleFonts.robotoCondensed(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -131,14 +144,16 @@ class WallVaultApp extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Light Theme
                 theme: ThemeData(
                   useMaterial3: true,
                   brightness: Brightness.light,
                   colorScheme: lightColorScheme,
                   scaffoldBackgroundColor: Colors.grey[50],
-                  textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+                  textTheme: GoogleFonts.robotoCondensedTextTheme(
+                    ThemeData.light().textTheme,
+                  ),
                   cardTheme: CardThemeData(
                     color: Colors.white,
                     elevation: 2,
@@ -159,7 +174,10 @@ class WallVaultApp extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                   navigationBarTheme: NavigationBarThemeData(
@@ -167,7 +185,7 @@ class WallVaultApp extends StatelessWidget {
                     elevation: 8,
                     height: 70,
                     labelTextStyle: WidgetStateProperty.all(
-                      GoogleFonts.inter(
+                      GoogleFonts.robotoCondensed(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -186,7 +204,7 @@ class WallVaultApp extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 home: const SplashScreen(),
               );
             },

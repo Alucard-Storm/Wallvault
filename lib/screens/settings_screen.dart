@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/wallpaper_provider.dart';
 import '../providers/favorites_provider.dart';
@@ -22,10 +25,12 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _apiKeyController = TextEditingController();
   bool _isApiKeyVisible = false;
+  late Future<String> _cacheSizeFuture;
 
   @override
   void initState() {
     super.initState();
+    _cacheSizeFuture = _getCacheSize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final settings = context.read<SettingsProvider>();
       _apiKeyController.text = settings.apiKey ?? '';
@@ -50,7 +55,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (confirmed == true && mounted) {
       await DefaultCacheManager().emptyCache();
+
+      // Refresh cache size after clearing
       if (mounted) {
+        setState(() {
+          _cacheSizeFuture = _getCacheSize();
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Cache cleared successfully'),
@@ -439,9 +450,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ListTile(
                         leading: const Icon(Icons.info_outline),
                         title: const Text('Cache Size'),
-                        subtitle: const Text('Calculating...'),
+                        subtitle: FutureBuilder<String>(
+                          future: _cacheSizeFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text('Calculating...');
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
                         trailing: FutureBuilder<String>(
-                          future: _getCacheSize(),
+                          future: _cacheSizeFuture,
                           builder: (context, snapshot) {
                             return Text(
                               snapshot.data ?? '...',
@@ -493,10 +513,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   GlassSettingsCard(
                     title: 'About',
                     children: [
-                      const ListTile(
+                      ListTile(
+                        leading: const Icon(Icons.person_4_outlined),
+                        title: const Text('Developer'),
+                        subtitle: Text('Alucard Stormbringer'),
+                        onTap: () {
+                          // Open Alucard Stormbringer's GitHub profile
+                          launchUrl(
+                            Uri.parse('https://github.com/Alucard-Storm'),
+                          );
+                        },
+                        trailing: const Icon(Icons.chevron_right),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
                         leading: Icon(Icons.info_outline),
                         title: Text('Version'),
-                        trailing: Text('1.0.0'),
+                        subtitle: Text('1.0.0'),
                       ),
                       const Divider(height: 1),
                       ListTile(
@@ -506,6 +539,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         trailing: const Icon(Icons.open_in_new),
                         onTap: () {
                           // Open Wallhaven website
+                          launchUrl(Uri.parse('https://wallhaven.cc'));
                         },
                       ),
                     ],
@@ -522,7 +556,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
                         side: const BorderSide(color: Colors.red),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                       ),
                     ),
                   ),
@@ -536,25 +570,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12, left: 4),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey[500],
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-
   Future<String> _getCacheSize() async {
     try {
-      // This is a simplified version - actual implementation would calculate size
-      return '~0 MB';
+      // Get the temporary directory where cache is stored
+      final tempDir = await getTemporaryDirectory();
+
+      if (!await tempDir.exists()) return '0 MB';
+
+      // Calculate total size by iterating through all files in temp directory
+      int totalBytes = 0;
+      await for (final entity in tempDir.list(recursive: true)) {
+        if (entity is File) {
+          try {
+            final stat = await entity.stat();
+            totalBytes += stat.size;
+          } catch (_) {
+            // Skip files that can't be accessed
+          }
+        }
+      }
+
+      // If no cache, return 0
+      if (totalBytes == 0) return '0 MB';
+
+      // Format size based on magnitude
+      if (totalBytes < 1024 * 1024) {
+        return '${(totalBytes / 1024).toStringAsFixed(1)} KB';
+      } else if (totalBytes < 1024 * 1024 * 1024) {
+        return '${(totalBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+      } else {
+        return '${(totalBytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+      }
     } catch (e) {
       return 'Unknown';
     }
