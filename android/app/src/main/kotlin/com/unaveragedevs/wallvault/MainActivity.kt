@@ -1,4 +1,4 @@
-package com.example.wallvault
+package com.unaveragedevs.wallvault
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -9,7 +9,7 @@ import android.os.Build
 import java.io.File
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.wallvault/wallpaper"
+    private val CHANNEL = "com.unaveragedevs.wallvault/wallpaper"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
