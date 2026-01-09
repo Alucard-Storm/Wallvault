@@ -15,12 +15,9 @@ import 'shimmer_loading.dart';
 
 class WallpaperGridItem extends StatefulWidget {
   final Wallpaper wallpaper;
-  
-  const WallpaperGridItem({
-    super.key,
-    required this.wallpaper,
-  });
-  
+
+  const WallpaperGridItem({super.key, required this.wallpaper});
+
   @override
   State<WallpaperGridItem> createState() => _WallpaperGridItemState();
 }
@@ -28,24 +25,24 @@ class WallpaperGridItem extends StatefulWidget {
 class _WallpaperGridItemState extends State<WallpaperGridItem> {
   bool _isPressed = false;
   bool _showGlassInfo = false;
-  
+
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
     HapticFeedback.lightImpact();
   }
-  
+
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
   }
-  
+
   void _onTapCancel() {
     setState(() => _isPressed = false);
   }
-  
+
   void _onLongPress() {
     HapticFeedback.mediumImpact();
     setState(() => _showGlassInfo = true);
-    
+
     // Auto-hide after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
@@ -53,7 +50,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
       }
     });
   }
-  
+
   void _onTap() {
     HapticFeedback.mediumImpact();
     Navigator.push(
@@ -62,19 +59,19 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             DetailScreen(wallpaper: widget.wallpaper),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
         transitionDuration: ThemeConfig.normalAnimation,
       ),
     );
   }
-  
+
   Future<void> _handleQuickDownload() async {
-    final downloadsProvider = Provider.of<DownloadsProvider>(context, listen: false);
-    
+    final downloadsProvider = Provider.of<DownloadsProvider>(
+      context,
+      listen: false,
+    );
+
     // Check if already downloaded
     if (downloadsProvider.isDownloaded(widget.wallpaper.id)) {
       if (mounted) {
@@ -89,18 +86,18 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
       }
       return;
     }
-    
+
     // Check if already in queue
     if (downloadsProvider.isInQueue(widget.wallpaper.id)) {
       return;
     }
-    
+
     try {
       HapticFeedback.mediumImpact();
-      
+
       // Add to queue tracking
       downloadsProvider.addToQueue(widget.wallpaper.id);
-      
+
       // Start download with progress tracking
       final filePath = await DownloadManager.downloadWallpaper(
         url: widget.wallpaper.path,
@@ -109,7 +106,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
           downloadsProvider.updateProgress(widget.wallpaper.id, progress);
         },
       );
-      
+
       if (filePath != null) {
         // Add to downloads list
         await downloadsProvider.addDownload(
@@ -121,7 +118,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
             resolution: widget.wallpaper.resolution,
           ),
         );
-        
+
         if (mounted) {
           HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -150,16 +147,20 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
       downloadsProvider.removeFromQueue(widget.wallpaper.id);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<FavoritesProvider, DownloadsProvider>(
       builder: (context, favoritesProvider, downloadsProvider, child) {
         final isFavorite = favoritesProvider.isFavorite(widget.wallpaper.id);
-        final isDownloaded = downloadsProvider.isDownloaded(widget.wallpaper.id);
-        final downloadProgress = downloadsProvider.getProgress(widget.wallpaper.id);
+        final isDownloaded = downloadsProvider.isDownloaded(
+          widget.wallpaper.id,
+        );
+        final downloadProgress = downloadsProvider.getProgress(
+          widget.wallpaper.id,
+        );
         final isInQueue = downloadsProvider.isInQueue(widget.wallpaper.id);
-        
+
         return GestureDetector(
           onTapDown: _onTapDown,
           onTapUp: _onTapUp,
@@ -177,6 +178,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                 elevation: _isPressed ? 2 : 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(ThemeConfig.radiusMedium),
+                  side: _getPurityBorder(),
                 ),
                 child: Stack(
                   fit: StackFit.expand,
@@ -193,11 +195,15 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[900],
-                          child: const Icon(Icons.error, color: Colors.red, size: 32),
+                          child: const Icon(
+                            Icons.error,
+                            color: Colors.red,
+                            size: 32,
+                          ),
                         ),
                       ),
                     ),
-                    
+
                     // Gradient overlay with enhanced stops
                     Positioned(
                       bottom: 0,
@@ -229,7 +235,9 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.6),
-                                borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+                                borderRadius: BorderRadius.circular(
+                                  ThemeConfig.radiusSmall,
+                                ),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.2),
                                   width: 1,
@@ -255,7 +263,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                                 ],
                               ),
                             ),
-                            
+
                             // Stats and favorite
                             Row(
                               children: [
@@ -270,28 +278,33 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                                   Text(
                                     _formatCount(widget.wallpaper.views),
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                 ],
-                                
+
                                 // Favorite indicator with animation
                                 if (isFavorite)
                                   Icon(
-                                    Icons.favorite,
-                                    color: Colors.red[400],
-                                    size: 20,
-                                  )
+                                        Icons.favorite,
+                                        color: Colors.red[400],
+                                        size: 20,
+                                      )
                                       .animate(
-                                        onPlay: (controller) => controller.repeat(reverse: true),
+                                        onPlay: (controller) =>
+                                            controller.repeat(reverse: true),
                                       )
                                       .scale(
                                         begin: const Offset(1.0, 1.0),
                                         end: const Offset(1.1, 1.1),
-                                        duration: const Duration(milliseconds: 1000),
+                                        duration: const Duration(
+                                          milliseconds: 1000,
+                                        ),
                                       ),
                               ],
                             ),
@@ -299,7 +312,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                       ),
                     ),
-                    
+
                     // Category badge (top right)
                     Positioned(
                       top: ThemeConfig.spaceSmall,
@@ -311,7 +324,9 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                         decoration: BoxDecoration(
                           color: _getCategoryColor(widget.wallpaper.category),
-                          borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+                          borderRadius: BorderRadius.circular(
+                            ThemeConfig.radiusSmall,
+                          ),
                           boxShadow: ThemeConfig.softShadow(Colors.black),
                         ),
                         child: Text(
@@ -325,196 +340,237 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                       ),
                     ),
-                    
-                    
+
                     // Quick download button (top left) with Glass UI
                     Positioned(
                       top: ThemeConfig.spaceSmall,
                       left: ThemeConfig.spaceSmall,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: isDownloaded 
-                                  ? Colors.green.withValues(alpha: 0.2)
-                                  : isInQueue
-                                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
-                                      : Colors.white.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: isDownloaded ? null : _handleQuickDownload,
+                      child:
+                          ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
-                                child: Center(
-                                  child: isInQueue && downloadProgress != null
-                                      ? Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            SizedBox(
-                                              width: 24,
-                                              height: 24,
-                                              child: CircularProgressIndicator(
-                                                value: downloadProgress,
-                                                strokeWidth: 2,
-                                                valueColor: AlwaysStoppedAnimation<Color>(
-                                                  Theme.of(context).colorScheme.primary,
-                                                ),
-                                                backgroundColor: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                    .withValues(alpha: 0.2),
-                                              ),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 10,
+                                    sigmaY: 10,
+                                  ),
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: isDownloaded
+                                          ? Colors.green.withValues(alpha: 0.2)
+                                          : isInQueue
+                                          ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withValues(alpha: 0.2)
+                                          : Colors.white.withValues(
+                                              alpha: 0.15,
                                             ),
-                                            Text(
-                                              '${(downloadProgress * 100).toInt()}',
-                                              style: TextStyle(
-                                                color: Theme.of(context).colorScheme.primary,
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : Icon(
-                                          isDownloaded 
-                                              ? Icons.check_circle
-                                              : Icons.download_rounded,
-                                          color: isDownloaded
-                                              ? Colors.green
-                                              : Colors.white,
-                                          size: 20,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.2,
                                         ),
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: isDownloaded
+                                            ? null
+                                            : _handleQuickDownload,
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Center(
+                                          child:
+                                              isInQueue &&
+                                                  downloadProgress != null
+                                              ? Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 24,
+                                                      height: 24,
+                                                      child: CircularProgressIndicator(
+                                                        value: downloadProgress,
+                                                        strokeWidth: 2,
+                                                        valueColor:
+                                                            AlwaysStoppedAnimation<
+                                                              Color
+                                                            >(
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary,
+                                                            ),
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .colorScheme
+                                                                .primary
+                                                                .withValues(
+                                                                  alpha: 0.2,
+                                                                ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${(downloadProgress * 100).toInt()}',
+                                                      style: TextStyle(
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary,
+                                                        fontSize: 8,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Icon(
+                                                  isDownloaded
+                                                      ? Icons.check_circle
+                                                      : Icons.download_rounded,
+                                                  color: isDownloaded
+                                                      ? Colors.green
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                              )
+                              .animate(target: isInQueue ? 1 : 0)
+                              .scale(
+                                begin: const Offset(1.0, 1.0),
+                                end: const Offset(1.05, 1.05),
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeInOut,
+                              )
+                              .shimmer(
+                                duration: const Duration(milliseconds: 1500),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
-                            ),
-                          ),
-                        ),
-                      )
-                        .animate(
-                          target: isInQueue ? 1 : 0,
-                        )
-                        .scale(
-                          begin: const Offset(1.0, 1.0),
-                          end: const Offset(1.05, 1.05),
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeInOut,
-                        )
-                        .shimmer(
-                          duration: const Duration(milliseconds: 1500),
-                          color: Colors.white.withValues(alpha: 0.3),
-                        ),
                     ),
-                    
-                    
-                    
-                    
+
                     // Glass info overlay (shown on long press)
                     if (_showGlassInfo)
                       Positioned.fill(
-                        child: LiquidGlassLayer(
-                          settings: LiquidGlassSettings(
-                            thickness: 20,
-                            blur: 12,
-                            glassColor: Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0x88000000)
-                                : const Color(0x88FFFFFF),
-                          ),
-                          child: LiquidGlass(
-                            shape: LiquidRoundedSuperellipse(
-                              borderRadius: ThemeConfig.radiusMedium,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: Theme.of(context).colorScheme.primary,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    widget.wallpaper.resolution,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    widget.wallpaper.category.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white.withValues(alpha: 0.8),
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
+                            child: LiquidGlassLayer(
+                              settings: LiquidGlassSettings(
+                                thickness: 20,
+                                blur: 12,
+                                glassColor:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0x88000000)
+                                    : const Color(0x88FFFFFF),
+                              ),
+                              child: LiquidGlass(
+                                shape: LiquidRoundedSuperellipse(
+                                  borderRadius: ThemeConfig.radiusMedium,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.remove_red_eye,
-                                        size: 14,
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        Icons.info_outline,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        size: 32,
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        _formatCount(widget.wallpaper.views),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white.withValues(alpha: 0.8),
+                                        widget.wallpaper.resolution,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Icon(
-                                        Icons.favorite,
-                                        size: 14,
-                                        color: Colors.white.withValues(alpha: 0.8),
-                                      ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(height: 4),
                                       Text(
-                                        _formatCount(widget.wallpaper.favorites),
+                                        widget.wallpaper.category.toUpperCase(),
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Colors.white.withValues(alpha: 0.8),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          letterSpacing: 1,
                                         ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.remove_red_eye,
+                                            size: 14,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _formatCount(
+                                              widget.wallpaper.views,
+                                            ),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.8,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Icon(
+                                            Icons.favorite,
+                                            size: 14,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _formatCount(
+                                              widget.wallpaper.favorites,
+                                            ),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.8,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
+                          )
+                          .animate()
+                          .fadeIn(duration: const Duration(milliseconds: 200))
+                          .scale(
+                            begin: const Offset(0.9, 0.9),
+                            end: const Offset(1.0, 1.0),
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
                           ),
-                        ),
-                      )
-                        .animate()
-                        .fadeIn(duration: const Duration(milliseconds: 200))
-                        .scale(
-                          begin: const Offset(0.9, 0.9),
-                          end: const Offset(1.0, 1.0),
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeOut,
-                        ),
                   ],
                 ),
               ),
@@ -524,7 +580,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
       },
     );
   }
-  
+
   String _formatCount(int count) {
     if (count >= 1000000) {
       return '${(count / 1000000).toStringAsFixed(1)}M';
@@ -533,7 +589,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
     }
     return count.toString();
   }
-  
+
   double _getAspectRatio(String resolution) {
     try {
       final parts = resolution.split('x');
@@ -550,7 +606,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
     // Default aspect ratio for wallpapers (9:16 portrait)
     return 9 / 16;
   }
-  
+
   Color _getCategoryColor(String category) {
     switch (category.toLowerCase()) {
       case 'general':
@@ -561,6 +617,17 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
         return Colors.orange.withValues(alpha: 0.8);
       default:
         return Colors.grey.withValues(alpha: 0.8);
+    }
+  }
+
+  BorderSide _getPurityBorder() {
+    switch (widget.wallpaper.purity.toLowerCase()) {
+      case 'sketchy':
+        return BorderSide(color: Colors.orange, width: 2.5);
+      case 'nsfw':
+        return BorderSide(color: Colors.red, width: 2.5);
+      default:
+        return BorderSide.none;
     }
   }
 }
