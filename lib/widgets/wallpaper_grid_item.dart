@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../models/wallpaper.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
@@ -12,6 +11,7 @@ import '../screens/detail_screen.dart';
 import '../utils/theme_config.dart';
 import '../utils/download_manager.dart';
 import 'shimmer_loading.dart';
+import 'wallpaper_quick_viewer.dart';
 
 class WallpaperGridItem extends StatefulWidget {
   final Wallpaper wallpaper;
@@ -24,7 +24,7 @@ class WallpaperGridItem extends StatefulWidget {
 
 class _WallpaperGridItemState extends State<WallpaperGridItem> {
   bool _isPressed = false;
-  bool _showGlassInfo = false;
+  OverlayEntry? _overlayEntry;
 
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
@@ -41,14 +41,26 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
 
   void _onLongPress() {
     HapticFeedback.mediumImpact();
-    setState(() => _showGlassInfo = true);
 
-    // Auto-hide after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() => _showGlassInfo = false);
-      }
-    });
+    // Create overlay entry
+    _overlayEntry = OverlayEntry(
+      builder: (context) => WallpaperQuickViewer(
+        wallpaper: widget.wallpaper,
+        onDismiss: () {
+          _overlayEntry?.remove();
+          _overlayEntry = null;
+        },
+      ),
+    );
+
+    // Insert overlay
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  @override
+  void dispose() {
+    _overlayEntry?.remove();
+    super.dispose();
   }
 
   void _onTap() {
@@ -461,116 +473,6 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                                 color: Colors.white.withValues(alpha: 0.3),
                               ),
                     ),
-
-                    // Glass info overlay (shown on long press)
-                    if (_showGlassInfo)
-                      Positioned.fill(
-                            child: LiquidGlassLayer(
-                              settings: LiquidGlassSettings(
-                                thickness: 20,
-                                blur: 12,
-                                glassColor:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? const Color(0x88000000)
-                                    : const Color(0x88FFFFFF),
-                              ),
-                              child: LiquidGlass(
-                                shape: LiquidRoundedSuperellipse(
-                                  borderRadius: ThemeConfig.radiusMedium,
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.info_outline,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        size: 32,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        widget.wallpaper.resolution,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        widget.wallpaper.category.toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.8,
-                                          ),
-                                          letterSpacing: 1,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.remove_red_eye,
-                                            size: 14,
-                                            color: Colors.white.withValues(
-                                              alpha: 0.8,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _formatCount(
-                                              widget.wallpaper.views,
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Icon(
-                                            Icons.favorite,
-                                            size: 14,
-                                            color: Colors.white.withValues(
-                                              alpha: 0.8,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _formatCount(
-                                              widget.wallpaper.favorites,
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                          .animate()
-                          .fadeIn(duration: const Duration(milliseconds: 200))
-                          .scale(
-                            begin: const Offset(0.9, 0.9),
-                            end: const Offset(1.0, 1.0),
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                          ),
                   ],
                 ),
               ),
