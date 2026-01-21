@@ -10,6 +10,7 @@ import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_settings_card.dart';
+import '../widgets/glass_toggle.dart';
 import '../widgets/category_purity_chips.dart';
 import '../widgets/parallax_floating_background.dart';
 import '../utils/constants.dart';
@@ -297,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         leading: const Icon(Icons.dark_mode),
                         title: const Text('Dark Theme'),
                         subtitle: const Text('Use dark theme for the app'),
-                        trailing: Switch(
+                        trailing: GlassToggle(
                           value: settings.isDarkTheme,
                           onChanged: (value) {
                             settings.toggleTheme();
@@ -311,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subtitle: const Text(
                           'Material You dynamic colors (Android 12+)',
                         ),
-                        trailing: Switch(
+                        trailing: GlassToggle(
                           value: settings.useSystemColors,
                           onChanged: (value) {
                             settings.toggleUseSystemColors();
