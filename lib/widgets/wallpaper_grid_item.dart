@@ -239,47 +239,9 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Resolution badge with glow
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.6),
-                                borderRadius: BorderRadius.circular(
-                                  ThemeConfig.radiusSmall,
-                                ),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.photo_size_select_large,
-                                    color: Colors.white,
-                                    size: 12,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    widget.wallpaper.resolution,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Stats and favorite
+                            // Views count (bottom left)
                             Row(
                               children: [
-                                // Views count
                                 if (widget.wallpaper.views > 0) ...[
                                   Icon(
                                     Icons.remove_red_eye,
@@ -297,29 +259,28 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
                                 ],
-
-                                // Favorite indicator with animation
-                                if (isFavorite)
-                                  Icon(
-                                        Icons.favorite,
-                                        color: Colors.red[400],
-                                        size: 20,
-                                      )
-                                      .animate(
-                                        onPlay: (controller) =>
-                                            controller.repeat(reverse: true),
-                                      )
-                                      .scale(
-                                        begin: const Offset(1.0, 1.0),
-                                        end: const Offset(1.1, 1.1),
-                                        duration: const Duration(
-                                          milliseconds: 1000,
-                                        ),
-                                      ),
                               ],
                             ),
+
+                            // Favorite indicator with animation
+                            if (isFavorite)
+                              Icon(
+                                    Icons.favorite,
+                                    color: Colors.red[400],
+                                    size: 20,
+                                  )
+                                  .animate(
+                                    onPlay: (controller) =>
+                                        controller.repeat(reverse: true),
+                                  )
+                                  .scale(
+                                    begin: const Offset(1.0, 1.0),
+                                    end: const Offset(1.1, 1.1),
+                                    duration: const Duration(
+                                      milliseconds: 1000,
+                                    ),
+                                  ),
                           ],
                         ),
                       ),
@@ -353,10 +314,51 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                       ),
                     ),
 
-                    // Quick download button (top left) with Glass UI
+                    // Resolution badge (top left)
                     Positioned(
                       top: ThemeConfig.spaceSmall,
                       left: ThemeConfig.spaceSmall,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(
+                            ThemeConfig.radiusSmall,
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.photo_size_select_large,
+                              color: Colors.white,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.wallpaper.resolution,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Quick download button (bottom right) with Glass UI
+                    Positioned(
+                      bottom: ThemeConfig.spaceSmall,
+                      right: ThemeConfig.spaceSmall,
                       child:
                           ClipRRect(
                                 borderRadius: BorderRadius.circular(20),

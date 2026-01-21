@@ -222,10 +222,10 @@ class _WallpaperQuickViewerState extends State<WallpaperQuickViewer> {
                                         ),
                                       ),
 
-                                      // Quick download button (bottom left)
+                                      // Quick download button (bottom right)
                                       Positioned(
                                         bottom: 8,
-                                        left: 8,
+                                        right: 8,
                                         child: Consumer<DownloadsProvider>(
                                           builder: (context, downloadsProvider, child) {
                                             final isDownloaded =
