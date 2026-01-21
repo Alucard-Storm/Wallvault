@@ -760,42 +760,75 @@ class _DetailScreenState extends State<DetailScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Wrap(
-                                      spacing: 4,
-                                      runSpacing: 4,
+                                      spacing: 8,
+                                      runSpacing: 8,
                                       children: _detailedWallpaper!.tags.map((
                                         tag,
                                       ) {
-                                        return ActionChip(
-                                          label: Text(
-                                            tag.name,
-                                            style: const TextStyle(
-                                              fontSize: 11,
+                                        return LiquidGlassLayer(
+                                          settings: LiquidGlassSettings(
+                                            thickness: 10,
+                                            blur: 6,
+                                            glassColor: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.12),
+                                          ),
+                                          child: LiquidGlass(
+                                            shape:
+                                                const LiquidRoundedSuperellipse(
+                                                  borderRadius: 16,
+                                                ),
+                                            child: InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SearchScreen(
+                                                          initialQuery:
+                                                              tag.name,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8,
+                                                    ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.tag,
+                                                      size: 14,
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                    ),
+                                                    const SizedBox(width: 6),
+                                                    Text(
+                                                      tag.name,
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyLarge
+                                                            ?.color,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          avatar: Icon(
-                                            Icons.tag,
-                                            size: 14,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 4,
-                                            vertical: 0,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                          onPressed: () {
-                                            // Navigate to search screen with tag query
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SearchScreen(
-                                                      initialQuery: tag.name,
-                                                    ),
-                                              ),
-                                            );
-                                          },
                                         );
                                       }).toList(),
                                     ),
