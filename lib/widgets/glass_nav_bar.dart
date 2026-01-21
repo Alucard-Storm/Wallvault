@@ -29,8 +29,8 @@ class FloatingGlassNavBar extends StatelessWidget {
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 28),
           child: Container(
-            height: 70,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            height: 74,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
@@ -60,37 +60,72 @@ class FloatingGlassNavBar extends StatelessWidget {
         ? colorScheme.primary
         : colorScheme.onSurface.withOpacity(0.6);
 
-    return Expanded(
-      child: InkWell(
-        onTap: () => onDestinationSelected(index),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconTheme(
+    final content = InkWell(
+      onTap: () => onDestinationSelected(index),
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: IconTheme(
+                key: ValueKey(isSelected),
                 data: IconThemeData(color: color, size: 24),
                 child: isSelected
                     ? (destination.selectedIcon ?? destination.icon)
                     : destination.icon,
               ),
-              const SizedBox(height: 2),
-              Text(
+            ),
+            const SizedBox(height: 4),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: color,
+                height: 1.2,
+              ),
+              child: Text(
                 destination.label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: color,
-                  height: 1.2,
-                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return Expanded(
+      child: AnimatedScale(
+        scale: isSelected ? 1.0 : 0.95,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: isSelected
+              ? LiquidGlassLayer(
+                  settings: LiquidGlassSettings(
+                    thickness: 12,
+                    blur: 6,
+                    glassColor: colorScheme.primary.withOpacity(0.15),
+                  ),
+                  child: LiquidGlass(
+                    shape: const LiquidRoundedSuperellipse(borderRadius: 16),
+                    child: content,
+                  ),
+                )
+              : content,
         ),
       ),
     );
