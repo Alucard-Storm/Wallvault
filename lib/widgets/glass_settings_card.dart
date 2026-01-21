@@ -32,8 +32,8 @@ class GlassSettingsCard extends StatelessWidget {
             padding: padding ?? const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xCC0A0E21)
-                  : const Color(0xCCF5F5F5),
+                  ? const Color(0x800A0E21)
+                  : const Color(0x80F5F5F5),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
