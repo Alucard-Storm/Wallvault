@@ -3,6 +3,7 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../utils/constants.dart';
 import '../utils/filter_utils.dart';
 import '../widgets/category_purity_chips.dart';
+import '../widgets/liquid_glass_chip.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final String currentCategories;
@@ -277,50 +278,25 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                SegmentedButton<String>(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                      Set<WidgetState> states,
-                    ) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.2);
-                      }
-                      return Colors.transparent;
-                    }),
-                    foregroundColor: WidgetStateProperty.resolveWith<Color>((
-                      Set<WidgetState> states,
-                    ) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).colorScheme.primary;
-                      }
-                      return Theme.of(context).textTheme.bodyLarge?.color ??
-                          Colors.white;
-                    }),
-                    side: WidgetStateProperty.all(
-                      BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withValues(alpha: 0.1)
-                            : Colors.black.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    LiquidGlassChip(
+                      label: 'Descending',
+                      isSelected: order == AppConstants.orderDesc,
+                      onTap: () {
+                        setState(() => order = AppConstants.orderDesc);
+                      },
                     ),
-                  ),
-                  segments: const [
-                    ButtonSegment(
-                      value: AppConstants.orderDesc,
-                      label: Text('Descending'),
-                    ),
-                    ButtonSegment(
-                      value: AppConstants.orderAsc,
-                      label: Text('Ascending'),
+                    LiquidGlassChip(
+                      label: 'Ascending',
+                      isSelected: order == AppConstants.orderAsc,
+                      onTap: () {
+                        setState(() => order = AppConstants.orderAsc);
+                      },
                     ),
                   ],
-                  selected: {order},
-                  onSelectionChanged: (Set<String> newSelection) {
-                    setState(() => order = newSelection.first);
-                  },
                 ),
                 const SizedBox(height: 30),
 
@@ -381,35 +357,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget _buildRatioChip(String label, String value) {
     final isSelected = ratios[value] ?? false;
 
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
+    return LiquidGlassChip(
+      label: label,
+      isSelected: isSelected,
+      onTap: () {
         setState(() {
-          ratios[value] = selected;
+          ratios[value] = !isSelected;
         });
       },
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white.withValues(alpha: 0.05)
-          : Colors.black.withValues(alpha: 0.05),
-      selectedColor: Theme.of(
-        context,
-      ).colorScheme.primary.withValues(alpha: 0.2),
-      checkmarkColor: Theme.of(context).colorScheme.primary,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).textTheme.bodyLarge?.color,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      side: BorderSide(
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : (Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.1)),
-        width: 1,
-      ),
     );
   }
 }
