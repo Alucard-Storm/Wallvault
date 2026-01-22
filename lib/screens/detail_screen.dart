@@ -765,67 +765,68 @@ class _DetailScreenState extends State<DetailScreen> {
                                       children: _detailedWallpaper!.tags.map((
                                         tag,
                                       ) {
-                                        return LiquidGlassLayer(
-                                          settings: LiquidGlassSettings(
-                                            thickness: 10,
-                                            blur: 6,
-                                            glassColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                                .withOpacity(0.12),
-                                          ),
-                                          child: LiquidGlass(
-                                            shape:
-                                                const LiquidRoundedSuperellipse(
-                                                  borderRadius: 16,
-                                                ),
-                                            child: InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        SearchScreen(
-                                                          initialQuery:
-                                                              tag.name,
-                                                        ),
-                                                  ),
-                                                );
-                                              },
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8,
-                                                    ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.tag,
-                                                      size: 14,
-                                                      color: Theme.of(
-                                                        context,
-                                                      ).colorScheme.primary,
-                                                    ),
-                                                    const SizedBox(width: 6),
-                                                    Text(
-                                                      tag.name,
-                                                      style: TextStyle(
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Theme.of(context)
-                                                            .textTheme
-                                                            .bodyLarge
-                                                            ?.color,
+                                        final colorScheme = Theme.of(context).colorScheme;
+                                        return Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SearchScreen(
+                                                        initialQuery:
+                                                            tag.name,
                                                       ),
-                                                    ),
+                                                ),
+                                              );
+                                            },
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 8,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    colorScheme.primary.withOpacity(0.2),
+                                                    colorScheme.primary.withOpacity(0.1),
                                                   ],
                                                 ),
+                                                borderRadius: BorderRadius.circular(16),
+                                                border: Border.all(
+                                                  color: colorScheme.primary.withOpacity(0.25),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize:
+                                                    MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.tag,
+                                                    size: 14,
+                                                    color: colorScheme.primary,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    tag.name,
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.color,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
