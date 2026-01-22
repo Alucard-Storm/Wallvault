@@ -31,13 +31,18 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen>
   void initState() {
     super.initState();
     _provider = WallpaperProvider();
-    _provider.updateFilters(sorting: AppConstants.sortToplist);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.addListener(_onScroll);
-      // Sync API key from settings to this provider instance
+      // Sync API key and default filters from settings to this provider instance
       final settings = context.read<SettingsProvider>();
       _provider.setApiKey(settings.apiKey);
+      // Use settings defaults for categories/purity but keep toplist sorting
+      _provider.updateFilters(
+        categories: settings.defaultCategories,
+        purity: settings.defaultPurity,
+        sorting: AppConstants.sortToplist,
+      );
     });
   }
 

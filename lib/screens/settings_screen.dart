@@ -85,6 +85,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (confirmed == true && mounted) {
       await context.read<SettingsProvider>().resetToDefaults();
+      // Also reset WallpaperProvider filters to defaults
+      context.read<WallpaperProvider>().syncWithSettings(
+        categories: AppConstants.categoryAll,
+        purity: AppConstants.puritySFW,
+        sorting: AppConstants.sortDateAdded,
+      );
       _apiKeyController.clear();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

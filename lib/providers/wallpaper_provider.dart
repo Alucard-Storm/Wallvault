@@ -42,6 +42,18 @@ class WallpaperProvider with ChangeNotifier {
     _apiKey = apiKey;
   }
 
+  // Sync filters with settings defaults
+  void syncWithSettings({
+    required String categories,
+    required String purity,
+    required String sorting,
+  }) {
+    _categories = categories;
+    _purity = purity;
+    _sorting = sorting;
+    loadWallpapers(refresh: true);
+  }
+
   // Load wallpapers
   Future<void> loadWallpapers({bool refresh = false}) async {
     if (_isLoading) return;

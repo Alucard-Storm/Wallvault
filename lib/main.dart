@@ -32,9 +32,15 @@ class WallVaultApp extends StatelessWidget {
           if (!settings.isLoaded) {
             Future.microtask(() async {
               await settings.loadSettings();
-              // Sync API key to WallpaperProvider after settings are loaded
+              // Sync API key and filter defaults to WallpaperProvider after settings are loaded
               if (context.mounted) {
-                context.read<WallpaperProvider>().setApiKey(settings.apiKey);
+                final wallpaperProvider = context.read<WallpaperProvider>();
+                wallpaperProvider.setApiKey(settings.apiKey);
+                wallpaperProvider.syncWithSettings(
+                  categories: settings.defaultCategories,
+                  purity: settings.defaultPurity,
+                  sorting: settings.defaultSorting,
+                );
               }
             });
           } else {

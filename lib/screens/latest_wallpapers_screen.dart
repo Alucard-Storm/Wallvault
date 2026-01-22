@@ -31,13 +31,18 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen>
   void initState() {
     super.initState();
     _provider = WallpaperProvider();
-    _provider.updateFilters(sorting: AppConstants.sortDateAdded);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.addListener(_onScroll);
-      // Sync API key from settings to this provider instance
+      // Sync API key and default filters from settings to this provider instance
       final settings = context.read<SettingsProvider>();
       _provider.setApiKey(settings.apiKey);
+      // Use settings defaults for categories/purity but keep date_added sorting
+      _provider.updateFilters(
+        categories: settings.defaultCategories,
+        purity: settings.defaultPurity,
+        sorting: AppConstants.sortDateAdded,
+      );
     });
   }
 
