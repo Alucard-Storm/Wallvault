@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/wallpaper.dart';
-import '../utils/glass_config.dart';
 
 /// A glass card showing download progress for a wallpaper
 class GlassDownloadCard extends StatelessWidget {
@@ -49,7 +47,7 @@ class GlassDownloadCard extends StatelessWidget {
                   child: SizedBox(
                     width: 76,
                     height: 76,
-                    child: CachedNetworkImageProvider(wallpaper.thumbs) != null
+                    child: wallpaper.thumbs.isNotEmpty
                         ? Image(
                             image: CachedNetworkImageProvider(wallpaper.thumbs),
                             fit: BoxFit.cover,
@@ -82,7 +80,7 @@ class GlassDownloadCard extends StatelessWidget {
                         '${wallpaper.category} • ${wallpaper.fileSizeFormatted}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 8),

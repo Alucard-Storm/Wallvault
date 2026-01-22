@@ -92,14 +92,14 @@ class _GlassSkeletonLoaderState extends State<GlassSkeletonLoader>
               end: Alignment.bottomRight,
               colors: [
                 (isDark ? Colors.white : Colors.black)
-                    .withOpacity(_opacityAnimation.value * 0.1),
+                    .withValues(alpha: _opacityAnimation.value * 0.1),
                 (isDark ? Colors.white : Colors.black)
-                    .withOpacity(_opacityAnimation.value * 0.05),
+                    .withValues(alpha: _opacityAnimation.value * 0.05),
               ],
             ),
             border: Border.all(
               color: (isDark ? Colors.white : Colors.black)
-                  .withOpacity(_opacityAnimation.value * 0.1),
+                  .withValues(alpha: _opacityAnimation.value * 0.1),
               width: 1,
             ),
           ),

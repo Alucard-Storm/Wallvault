@@ -46,7 +46,9 @@ class WallVaultApp extends StatelessWidget {
           } else {
             // Sync API key whenever settings change
             Future.microtask(() {
-              context.read<WallpaperProvider>().setApiKey(settings.apiKey);
+              if (context.mounted) {
+                context.read<WallpaperProvider>().setApiKey(settings.apiKey);
+              }
             });
           }
 

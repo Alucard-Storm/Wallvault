@@ -20,7 +20,7 @@ class DownloadProgressOverlay extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
       ),
       child: LiquidGlass(
         shape: LiquidRoundedSuperellipse(borderRadius: 30),
@@ -44,7 +44,7 @@ class DownloadProgressOverlay extends StatelessWidget {
           child: CircularProgressIndicator(
             value: progress,
             strokeWidth: 6,
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
               Theme.of(context).colorScheme.primary,
             ),
@@ -93,7 +93,7 @@ class DownloadProgressOverlay extends StatelessWidget {
               color: Colors.green,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.green.withOpacity(0.5),
+                  color: Colors.green.withValues(alpha: 0.5),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
@@ -129,7 +129,7 @@ class CompactDownloadProgress extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -140,7 +140,7 @@ class CompactDownloadProgress extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress,
               strokeWidth: 3,
-              backgroundColor: Colors.white.withOpacity(0.3),
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(
                 Theme.of(context).colorScheme.primary,
               ),

@@ -57,24 +57,24 @@ class _FilterPresetBubbleState extends State<FilterPresetBubble> {
                 end: Alignment.bottomRight,
                 colors: widget.isSelected
                     ? [
-                        color.withOpacity(0.4),
-                        color.withOpacity(0.2),
+                        color.withValues(alpha: 0.4),
+                        color.withValues(alpha: 0.2),
                       ]
                     : [
-                        Colors.white.withOpacity(0.15),
-                        Colors.white.withOpacity(0.05),
+                        Colors.white.withValues(alpha: 0.15),
+                        Colors.white.withValues(alpha: 0.05),
                       ],
               ),
               border: Border.all(
                 color: widget.isSelected
-                    ? color.withOpacity(0.6)
-                    : Colors.white.withOpacity(0.2),
+                    ? color.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.2),
                 width: 2,
               ),
               boxShadow: widget.isSelected
                   ? [
                       BoxShadow(
-                        color: color.withOpacity(0.3),
+                        color: color.withValues(alpha: 0.3),
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),

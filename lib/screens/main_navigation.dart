@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
 import '../providers/settings_provider.dart';

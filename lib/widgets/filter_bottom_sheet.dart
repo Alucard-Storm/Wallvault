@@ -307,7 +307,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     blur: 8,
                     glassColor: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.3),
+                    ).colorScheme.primary.withValues(alpha: 0.3),
                   ),
                   child: LiquidGlass(
                     shape: const LiquidRoundedSuperellipse(borderRadius: 16),

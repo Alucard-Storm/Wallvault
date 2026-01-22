@@ -64,7 +64,7 @@ class _RadialActionMenuState extends State<RadialActionMenu>
     return GestureDetector(
       onTap: _close,
       child: Container(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         child: Stack(
           children: [
             // Center button
@@ -99,12 +99,12 @@ class _RadialActionMenuState extends State<RadialActionMenu>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withOpacity(0.2),
-              Colors.white.withOpacity(0.1),
+              Colors.white.withValues(alpha: 0.2),
+              Colors.white.withValues(alpha: 0.1),
             ],
           ),
           border: Border.all(
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -167,17 +167,17 @@ class _RadialActionMenuState extends State<RadialActionMenu>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                item.color?.withOpacity(0.3) ?? Colors.white.withOpacity(0.2),
-                item.color?.withOpacity(0.2) ?? Colors.white.withOpacity(0.1),
+                item.color?.withValues(alpha: 0.3) ?? Colors.white.withValues(alpha: 0.2),
+                item.color?.withValues(alpha: 0.2) ?? Colors.white.withValues(alpha: 0.1),
               ],
             ),
             border: Border.all(
-              color: item.color?.withOpacity(0.5) ?? Colors.white.withOpacity(0.3),
+              color: item.color?.withValues(alpha: 0.5) ?? Colors.white.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: (item.color ?? Colors.white).withOpacity(0.3),
+                color: (item.color ?? Colors.white).withValues(alpha: 0.3),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),

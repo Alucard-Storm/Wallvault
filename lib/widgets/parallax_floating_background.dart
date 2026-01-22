@@ -143,7 +143,7 @@ class FloatingElementsPainter extends CustomPainter {
       final enhancedColor = Color.lerp(baseColor, Colors.black, 0.2)!;
       
       final paint = Paint()
-        ..color = enhancedColor.withOpacity(element.opacity)
+        ..color = enhancedColor.withValues(alpha: element.opacity)
         ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, element.blur);
 
       final center = Offset(

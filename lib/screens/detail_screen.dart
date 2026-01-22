@@ -31,7 +31,6 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  double? _downloadProgress;
   Wallpaper? _detailedWallpaper;
   bool _isLoadingDetails = false;
   Offset? _swipeStart;
@@ -173,9 +172,6 @@ class _DetailScreenState extends State<DetailScreen> {
         wallpaperId: widget.wallpaper.id,
         onProgress: (progress) {
           if (mounted) {
-            setState(() {
-              _downloadProgress = progress;
-            });
             downloadsProvider.updateProgress(widget.wallpaper.id, progress);
           }
         },
@@ -239,9 +235,6 @@ class _DetailScreenState extends State<DetailScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _downloadProgress = null;
-        });
         downloadsProvider.removeFromQueue(widget.wallpaper.id);
       }
     }
@@ -334,7 +327,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   void _searchByColor(Color color) {
     HapticManager.lightTap();
-    final hexColor = color.value.toRadixString(16).substring(2);
+    final hexColor = color.toARGB32().toRadixString(16).substring(2);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -409,8 +402,8 @@ class _DetailScreenState extends State<DetailScreen> {
                   filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                   child: Container(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.white.withOpacity(0.5),
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -794,13 +787,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                   colors: [
-                                                    colorScheme.primary.withOpacity(0.2),
-                                                    colorScheme.primary.withOpacity(0.1),
+                                                    colorScheme.primary.withValues(alpha: 0.2),
+                                                    colorScheme.primary.withValues(alpha: 0.1),
                                                   ],
                                                 ),
                                                 borderRadius: BorderRadius.circular(16),
                                                 border: Border.all(
-                                                  color: colorScheme.primary.withOpacity(0.25),
+                                                  color: colorScheme.primary.withValues(alpha: 0.25),
                                                   width: 1,
                                                 ),
                                               ),

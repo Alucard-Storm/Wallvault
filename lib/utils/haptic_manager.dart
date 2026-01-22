@@ -5,12 +5,12 @@ import 'package:vibration/vibration.dart';
 class HapticManager {
   // Check if device supports vibration
   static Future<bool> get hasVibrator async {
-    return await Vibration.hasVibrator() ?? false;
+    return await Vibration.hasVibrator();
   }
   
   // Check if device supports custom vibrations
   static Future<bool> get hasCustomVibrations async {
-    return await Vibration.hasCustomVibrationsSupport() ?? false;
+    return await Vibration.hasCustomVibrationsSupport();
   }
   
   /// Light tap - for button presses

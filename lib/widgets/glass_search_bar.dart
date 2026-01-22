@@ -43,7 +43,7 @@ class GlassSearchBar extends StatelessWidget {
                   Icons.search,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -63,7 +63,7 @@ class GlassSearchBar extends StatelessWidget {
                       hintStyle: TextStyle(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.4),
+                        ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -82,7 +82,7 @@ class GlassSearchBar extends StatelessWidget {
                         },
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
               ],
             ),

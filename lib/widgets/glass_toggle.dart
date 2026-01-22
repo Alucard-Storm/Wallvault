@@ -32,19 +32,19 @@ class GlassToggle extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: value
                 ? [
-                    primaryColor.withOpacity(0.35),
-                    primaryColor.withOpacity(0.25),
+                    primaryColor.withValues(alpha: 0.35),
+                    primaryColor.withValues(alpha: 0.25),
                   ]
                 : [
-                    (isDark ? Colors.white : Colors.black).withOpacity(0.12),
-                    (isDark ? Colors.white : Colors.black).withOpacity(0.06),
+                    (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12),
+                    (isDark ? Colors.white : Colors.black).withValues(alpha: 0.06),
                   ],
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: value
-                ? primaryColor.withOpacity(0.4)
-                : (isDark ? Colors.white : Colors.black).withOpacity(0.15),
+                ? primaryColor.withValues(alpha: 0.4)
+                : (isDark ? Colors.white : Colors.black).withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -65,8 +65,8 @@ class GlassToggle extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: value
-                        ? primaryColor.withOpacity(0.4)
-                        : Colors.black.withOpacity(0.2),
+                        ? primaryColor.withValues(alpha: 0.4)
+                        : Colors.black.withValues(alpha: 0.2),
                     blurRadius: value ? 8 : 4,
                     spreadRadius: value ? 1 : 0,
                   ),

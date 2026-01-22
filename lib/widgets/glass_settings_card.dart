@@ -87,7 +87,7 @@ class GlassDialog extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
+              color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -108,7 +108,7 @@ class GlassDialog extends StatelessWidget {
                     fontSize: 14,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.8),
+                    ).colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 24),

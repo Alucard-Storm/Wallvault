@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 /// A reusable liquid glass chip widget with checkmark
 class LiquidGlassChip extends StatelessWidget {
@@ -43,19 +42,19 @@ class LiquidGlassChip extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: isSelected
                   ? [
-                      colorScheme.primary.withOpacity(0.25),
-                      colorScheme.primary.withOpacity(0.15),
+                      colorScheme.primary.withValues(alpha: 0.25),
+                      colorScheme.primary.withValues(alpha: 0.15),
                     ]
                   : [
-                      (isDark ? Colors.white : Colors.black).withOpacity(0.08),
-                      (isDark ? Colors.white : Colors.black).withOpacity(0.04),
+                      (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
+                      (isDark ? Colors.white : Colors.black).withValues(alpha: 0.04),
                     ],
             ),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
               color: isSelected
-                  ? colorScheme.primary.withOpacity(0.3)
-                  : (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                  ? colorScheme.primary.withValues(alpha: 0.3)
+                  : (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
               width: 1,
             ),
           ),

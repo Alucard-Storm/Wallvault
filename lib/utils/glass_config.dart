@@ -55,7 +55,7 @@ class GlassConfig {
     return LiquidGlassSettings(
       thickness: thickness ?? 15,
       blur: blur ?? 8,
-      glassColor: baseColor.withOpacity(opacity),
+      glassColor: baseColor.withValues(alpha: opacity),
     );
   }
   

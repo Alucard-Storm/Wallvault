@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 
@@ -22,7 +23,7 @@ class WallpaperManagerChannel {
       });
       return result;
     } on PlatformException catch (e) {
-      print('Failed to set wallpaper: ${e.message}');
+      debugPrint('Failed to set wallpaper: ${e.message}');
       return false;
     }
   }

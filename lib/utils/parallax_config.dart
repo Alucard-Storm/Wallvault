@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 /// Configuration for parallax scrolling effects
 class ParallaxConfig {

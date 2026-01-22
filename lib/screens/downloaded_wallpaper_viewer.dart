@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:vibration/vibration.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
@@ -98,8 +97,8 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                   child: Container(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black.withOpacity(0.5)
-                        : Colors.white.withOpacity(0.5),
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -179,7 +178,7 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                                   blur: 12,
                                   glassColor: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.4),
+                                  ).colorScheme.primary.withValues(alpha: 0.4),
                                 ),
                                 child: LiquidGlass(
                                   shape: const LiquidRoundedSuperellipse(

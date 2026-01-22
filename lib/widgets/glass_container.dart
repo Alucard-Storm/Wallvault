@@ -103,11 +103,6 @@ class FakeGlassContainer extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? 
-        (Theme.of(context).brightness == Brightness.dark
-            ? Colors.black.withOpacity(0.3)
-            : Colors.white.withOpacity(0.3));
-    
     Widget glassWidget = FakeGlass(
       shape: LiquidRoundedSuperellipse(borderRadius: 30),
       child: Container(

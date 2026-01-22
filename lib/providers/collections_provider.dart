@@ -21,16 +21,12 @@ class CollectionsProvider with ChangeNotifier {
       _collections.putIfAbsent(category, () => []).add(wallpaper);
       
       // Categorize by resolution
-      if (wallpaper.resolution != null) {
-        final resCategory = _getResolutionCategory(wallpaper.resolution);
-        _collections.putIfAbsent(resCategory, () => []).add(wallpaper);
-      }
+      final resCategory = _getResolutionCategory(wallpaper.resolution);
+      _collections.putIfAbsent(resCategory, () => []).add(wallpaper);
       
       // Categorize by aspect ratio
-      if (wallpaper.resolution != null) {
-        final aspectCategory = _getAspectRatioCategory(wallpaper.resolution);
-        _collections.putIfAbsent(aspectCategory, () => []).add(wallpaper);
-      }
+      final aspectCategory = _getAspectRatioCategory(wallpaper.resolution);
+      _collections.putIfAbsent(aspectCategory, () => []).add(wallpaper);
     }
     
     notifyListeners();

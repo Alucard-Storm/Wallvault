@@ -24,7 +24,7 @@ class GlassLoadingIndicator extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+              color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -48,7 +48,7 @@ class GlassLoadingIndicator extends StatelessWidget {
                       fontSize: 14,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.8),
+                      ).colorScheme.onSurface.withValues(alpha: 0.8),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -102,7 +102,7 @@ class GlassEmptyState extends StatelessWidget {
                     size: 64,
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.6),
+                    ).colorScheme.primary.withValues(alpha: 0.6),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -121,7 +121,7 @@ class GlassEmptyState extends StatelessWidget {
                         fontSize: 14,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       textAlign: TextAlign.center,
                     ),

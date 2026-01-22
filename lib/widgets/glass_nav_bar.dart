@@ -58,7 +58,7 @@ class FloatingGlassNavBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final color = isSelected
         ? colorScheme.primary
-        : colorScheme.onSurface.withOpacity(0.6);
+        : colorScheme.onSurface.withValues(alpha: 0.6);
 
     final content = InkWell(
       onTap: () => onDestinationSelected(index),
@@ -120,13 +120,13 @@ class FloatingGlassNavBar extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        colorScheme.primary.withOpacity(0.15),
-                        colorScheme.primary.withOpacity(0.08),
+                        colorScheme.primary.withValues(alpha: 0.15),
+                        colorScheme.primary.withValues(alpha: 0.08),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -165,7 +165,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
             width: 0.5,
           ),
         ),
@@ -203,7 +203,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   ),
                 ),
               ],

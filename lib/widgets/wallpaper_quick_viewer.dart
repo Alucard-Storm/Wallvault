@@ -84,7 +84,7 @@ class _WallpaperQuickViewerState extends State<WallpaperQuickViewer> {
           ),
         );
 
-        if (mounted) {
+        if (context.mounted) {
           HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -98,7 +98,7 @@ class _WallpaperQuickViewerState extends State<WallpaperQuickViewer> {
       }
     } catch (e) {
       debugPrint('Quick download error: $e');
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Download failed: ${e.toString()}'),

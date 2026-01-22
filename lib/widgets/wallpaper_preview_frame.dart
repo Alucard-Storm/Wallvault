@@ -72,7 +72,7 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
             borderRadius: BorderRadius.circular(40),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 30,
                 spreadRadius: 5,
               ),
@@ -130,9 +130,9 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.3),
+            Colors.black.withValues(alpha: 0.3),
             Colors.transparent,
-            Colors.black.withOpacity(0.5),
+            Colors.black.withValues(alpha: 0.5),
           ],
         ),
       ),
@@ -176,7 +176,7 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.transparent, Colors.black.withOpacity(0.2)],
+          colors: [Colors.transparent, Colors.black.withValues(alpha: 0.2)],
         ),
       ),
       child: Column(
@@ -230,10 +230,10 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -253,8 +253,8 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
       height: 50,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.2),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+        color: Colors.white.withValues(alpha: 0.2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
       ),
       child: Icon(icon, color: Colors.white, size: 24),
     );
@@ -263,9 +263,9 @@ class _WallpaperPreviewFrameState extends State<WallpaperPreviewFrame>
   Widget _buildAppIcon() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
+        color: Colors.white.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1),
       ),
     );
   }

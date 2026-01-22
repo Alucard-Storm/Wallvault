@@ -65,14 +65,14 @@ class _AnimatedColorPaletteState extends State<AnimatedColorPalette> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.4),
+              color: color.withValues(alpha: 0.4),
               blurRadius: isTapped ? 12 : 8,
               spreadRadius: isTapped ? 2 : 0,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 2,
           ),
         ),
@@ -174,14 +174,14 @@ class _AnimatedColorChipState extends State<AnimatedColorChip>
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(0.4),
+                color: widget.color.withValues(alpha: 0.4),
                 blurRadius: _isPressed ? 12 : 8,
                 spreadRadius: _isPressed ? 2 : 0,
                 offset: const Offset(0, 4),
               ),
             ],
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 2,
             ),
           ),
@@ -192,7 +192,7 @@ class _AnimatedColorChipState extends State<AnimatedColorChip>
                     return CustomPaint(
                       painter: _RipplePainter(
                         progress: _rippleController.value,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                     );
                   },
@@ -223,7 +223,7 @@ class _RipplePainter extends CustomPainter {
     final opacity = 1.0 - progress;
     
     final paint = Paint()
-      ..color = color.withOpacity(opacity)
+      ..color = color.withValues(alpha: opacity)
       ..style = PaintingStyle.fill;
     
     canvas.drawCircle(center, radius, paint);
