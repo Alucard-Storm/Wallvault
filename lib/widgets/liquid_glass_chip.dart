@@ -24,49 +24,63 @@ class LiquidGlassChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LiquidGlassLayer(
-      settings: LiquidGlassSettings(
-        thickness: isSelected ? 12 : 8,
-        blur: 6,
-        glassColor: isSelected
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-            : (Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x1AFFFFFF)
-                  : const Color(0x1A000000)),
-      ),
-      child: LiquidGlass(
-        shape: LiquidRoundedSuperellipse(borderRadius: borderRadius),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: verticalPadding,
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isSelected
+                  ? [
+                      colorScheme.primary.withOpacity(0.25),
+                      colorScheme.primary.withOpacity(0.15),
+                    ]
+                  : [
+                      (isDark ? Colors.white : Colors.black).withOpacity(0.08),
+                      (isDark ? Colors.white : Colors.black).withOpacity(0.04),
+                    ],
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isSelected) ...[
-                  Icon(
-                    Icons.check,
-                    size: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).textTheme.bodyLarge?.color,
-                  ),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: isSelected
+                  ? colorScheme.primary.withOpacity(0.3)
+                  : (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSelected) ...[
+                Icon(
+                  Icons.check,
+                  size: 16,
+                  color: colorScheme.primary,
                 ),
+                const SizedBox(width: 6),
               ],
-            ),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected
+                      ? colorScheme.primary
+                      : Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ],
           ),
         ),
       ),

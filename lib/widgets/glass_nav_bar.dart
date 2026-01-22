@@ -114,16 +114,23 @@ class FloatingGlassNavBar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: isSelected
-              ? LiquidGlassLayer(
-                  settings: LiquidGlassSettings(
-                    thickness: 12,
-                    blur: 6,
-                    glassColor: colorScheme.primary.withOpacity(0.15),
+              ? Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colorScheme.primary.withOpacity(0.15),
+                        colorScheme.primary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.primary.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
-                  child: LiquidGlass(
-                    shape: const LiquidRoundedSuperellipse(borderRadius: 16),
-                    child: content,
-                  ),
+                  child: content,
                 )
               : content,
         ),
