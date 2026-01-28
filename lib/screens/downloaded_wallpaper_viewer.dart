@@ -5,8 +5,10 @@ import 'package:photo_view/photo_view.dart';
 import 'package:vibration/vibration.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../providers/downloads_provider.dart';
 import '../utils/wallpaper_setter.dart';
+import '../utils/download_manager.dart';
 import '../utils/theme_config.dart';
 import '../widgets/glass_nav_bar.dart';
 
@@ -60,6 +62,62 @@ class DownloadedWallpaperViewer extends StatelessWidget {
     }
   }
 
+  Future<void> _deleteWallpaper(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Wallpaper?'),
+        content: const Text(
+          'This will permanently delete this wallpaper from your device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final success = await DownloadManager.deleteWallpaper(
+        downloadInfo.filePath,
+      );
+      
+      if (context.mounted) {
+        if (success) {
+          // Remove from provider
+          Provider.of<DownloadsProvider>(
+            context,
+            listen: false,
+          ).removeDownload(downloadInfo.wallpaperId);
+
+          Navigator.pop(context); // Close viewer
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Wallpaper deleted'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConfig.radiusSmall),
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to delete wallpaper')),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +130,12 @@ class DownloadedWallpaperViewer extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+             color: Colors.red,
+            onPressed: () => _deleteWallpaper(context),
+            tooltip: 'Delete',
+          ),
           IconButton(
             icon: const Icon(Icons.wallpaper),
             onPressed: () => _setWallpaper(context),
