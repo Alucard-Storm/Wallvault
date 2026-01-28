@@ -35,7 +35,7 @@ class WallVaultApp extends StatelessWidget {
               // Sync API key and filter defaults to WallpaperProvider after settings are loaded
               if (context.mounted) {
                 final wallpaperProvider = context.read<WallpaperProvider>();
-                wallpaperProvider.setApiKey(settings.apiKey);
+                wallpaperProvider.setApiKey(settings.apiKey, refresh: false);
                 wallpaperProvider.syncWithSettings(
                   categories: settings.defaultCategories,
                   purity: settings.defaultPurity,

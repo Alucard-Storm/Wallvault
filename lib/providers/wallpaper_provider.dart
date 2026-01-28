@@ -38,8 +38,13 @@ class WallpaperProvider with ChangeNotifier {
   String get ratios => _ratios;
 
   // Set API key
-  void setApiKey(String? apiKey) {
-    _apiKey = apiKey;
+  void setApiKey(String? apiKey, {bool refresh = true}) {
+    if (_apiKey != apiKey) {
+      _apiKey = apiKey;
+      if (refresh) {
+        loadWallpapers(refresh: true);
+      }
+    }
   }
 
   // Sync filters with settings defaults

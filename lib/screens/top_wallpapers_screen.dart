@@ -36,7 +36,7 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen>
       _scrollController.addListener(_onScroll);
       // Sync API key and default filters from settings to this provider instance
       final settings = context.read<SettingsProvider>();
-      _provider.setApiKey(settings.apiKey);
+      _provider.setApiKey(settings.apiKey, refresh: false);
       // Use settings defaults for categories/purity but keep toplist sorting
       _provider.updateFilters(
         categories: settings.defaultCategories,
