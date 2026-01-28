@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:isolate';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:gal/gal.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
 class DownloadTask {
@@ -17,6 +17,56 @@ class DownloadTask {
     required this.wallpaperId,
     this.onProgress,
   }) : completer = Completer<String?>();
+}
+
+// Configuration passed to the Isolate
+class DownloadConfig {
+  final String url;
+  final String savePath;
+  final SendPort sendPort;
+
+  DownloadConfig({
+    required this.url,
+    required this.savePath,
+    required this.sendPort,
+  });
+}
+
+// Download Worker (runs in a separate isolate)
+Future<void> _downloadWorker(DownloadConfig config) async {
+  try {
+    final client = http.Client();
+    final request = http.Request('GET', Uri.parse(config.url));
+    final response = await client.send(request);
+
+    if (response.statusCode == 200) {
+      final contentLength = response.contentLength ?? 0;
+      final file = File(config.savePath);
+      final sink = file.openWrite();
+      
+      int downloadedBytes = 0;
+      
+      await for (final chunk in response.stream) {
+        sink.add(chunk);
+        downloadedBytes += chunk.length;
+        
+        if (contentLength > 0) {
+          final progress = downloadedBytes / contentLength;
+          config.sendPort.send(progress); // Send progress update
+        }
+      }
+      
+      await sink.flush();
+      await sink.close();
+      client.close();
+      
+      config.sendPort.send('DONE'); // Send completion signal
+    } else {
+      config.sendPort.send(Exception('Failed to download: ${response.statusCode}'));
+    }
+  } catch (e) {
+    config.sendPort.send(e);
+  }
 }
 
 class DownloadManager {
@@ -33,8 +83,9 @@ class DownloadManager {
   static Future<bool> requestPermission() async {
     if (Platform.isAndroid) {
       // Android 12+ (API 32+) uses READ_MEDIA_IMAGES permission
-      final status = await Permission.photos.request();
-      return status.isGranted;
+      // For older versions or saving to gallery, storage might be needed depending on implementation
+      // But Gal handles permissions internally for saving
+      return true;
     }
     return true;
   }
@@ -90,63 +141,75 @@ class DownloadManager {
     debugPrint('Queue processing completed');
   }
   
-  // Internal download method
+  // Internal download method using Isolate
   static Future<String?> _downloadFile({
     required String url,
     required String wallpaperId,
     Function(double)? onProgress,
   }) async {
     try {
-      // Request permission
-      final hasPermission = await requestPermission();
-      if (!hasPermission) {
-        throw Exception('Storage permission denied');
-      }
+      // Get file extension
+      final extension = url.split('.').last.split('?').first;
       
-      // Download file with progress tracking
-      final request = http.Request('GET', Uri.parse(url));
-      final response = await request.send();
+      // Get directories
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/wallvault_$wallpaperId.$extension';
       
-      if (response.statusCode == 200) {
-        final contentLength = response.contentLength ?? 0;
-        final bytes = <int>[];
-        var downloadedBytes = 0;
-        
-        await for (final chunk in response.stream) {
-          bytes.addAll(chunk);
-          downloadedBytes += chunk.length;
-          
-          if (contentLength > 0 && onProgress != null) {
-            final progress = downloadedBytes / contentLength;
-            onProgress(progress);
+      // Create a ReceivePort to communicate with the isolate
+      final receivePort = ReceivePort();
+      
+      // Spawn the isolate
+      await Isolate.spawn(
+        _downloadWorker,
+        DownloadConfig(
+          url: url,
+          savePath: filePath,
+          sendPort: receivePort.sendPort,
+        ),
+      );
+      
+      // Listen for messages from the isolate
+      final completer = Completer<String?>();
+      
+      receivePort.listen((message) {
+        if (message is double) {
+          // Progress update
+          if (onProgress != null) {
+            onProgress(message);
           }
+        } else if (message == 'DONE') {
+          // Download complete
+          receivePort.close();
+          completer.complete(filePath);
+        } else if (message is Exception || message is Error) {
+          // Error occurred
+          receivePort.close();
+          completer.completeError(message);
         }
-        
-        // Get file extension
-        final extension = url.split('.').last.split('?').first;
-        
-        // Save to app directory first
-        final directory = await getApplicationDocumentsDirectory();
-        final filePath = '${directory.path}/wallvault_$wallpaperId.$extension';
-        final file = File(filePath);
-        await file.writeAsBytes(bytes);
-        
-        // Save to gallery using gal
+      }, onError: (error) {
+         receivePort.close();
+         completer.completeError(error);
+      });
+      
+      final resultPath = await completer.future;
+      
+      // Save to gallery using gal (Must be done on main isolate)
+      if (resultPath != null) {
         try {
-          await Gal.putImage(filePath, album: 'WallVault');
+          await Gal.putImage(resultPath, album: 'WallVault');
         } catch (e) {
           debugPrint('Error saving to gallery: $e');
-          // Continue even if gallery save fails - we still have the file in app directory
+          // Continue even if gallery save fails
         }
         
+        // Final progress update
         if (onProgress != null) {
           onProgress(1.0);
         }
-        
-        return filePath;
-      } else {
-        throw Exception('Failed to download: ${response.statusCode}');
       }
+      
+      return resultPath;
+      
     } catch (e) {
       debugPrint('Download error: $e');
       rethrow;

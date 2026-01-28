@@ -1,9 +1,22 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/wallpaper.dart';
 import '../models/wallpaper_detail.dart';
 import '../utils/constants.dart';
 
+// Top-level function for compute
+List<Wallpaper> _parseWallpapers(String responseBody) {
+  final data = json.decode(responseBody);
+  final List wallpapers = data['data'];
+  return wallpapers.map((json) => Wallpaper.fromJson(json)).toList();
+}
+
+// Top-level function for compute
+WallpaperDetail _parseWallpaperDetail(String responseBody) {
+  final data = json.decode(responseBody);
+  return WallpaperDetail.fromJson(data['data']);
+}
 
 class WallhavenApi {
   static const String _baseUrl = AppConstants.wallhavenBaseUrl;
@@ -57,9 +70,8 @@ class WallhavenApi {
       final response = await http.get(uri);
       
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List wallpapers = data['data'];
-        return wallpapers.map((json) => Wallpaper.fromJson(json)).toList();
+        // Use compute to parse JSON in a background isolate
+        return await compute(_parseWallpapers, response.body);
       } else {
         throw Exception('Failed to load wallpapers: ${response.statusCode}');
       }
@@ -100,9 +112,8 @@ class WallhavenApi {
       final response = await http.get(uri);
       
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List wallpapers = data['data'];
-        return wallpapers.map((json) => Wallpaper.fromJson(json)).toList();
+        // Use compute to parse JSON in a background isolate
+        return await compute(_parseWallpapers, response.body);
       } else {
         throw Exception('Failed to search wallpapers: ${response.statusCode}');
       }
@@ -138,8 +149,8 @@ class WallhavenApi {
       final response = await http.get(uri);
       
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return WallpaperDetail.fromJson(data['data']);
+        // Use compute to parse JSON in a background isolate
+        return await compute(_parseWallpaperDetail, response.body);
       } else {
         throw Exception('Failed to load wallpaper details: ${response.statusCode}');
       }

@@ -196,21 +196,25 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                   fit: StackFit.expand,
                   children: [
                     // Wallpaper image with hero animation
-                    Hero(
-                      tag: 'wallpaper_${widget.wallpaper.id}',
-                      child: CachedNetworkImage(
-                        imageUrl: widget.wallpaper.thumbs,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => const ShimmerLoading(
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[900],
-                          child: const Icon(
-                            Icons.error,
-                            color: Colors.red,
-                            size: 32,
+                    // Optimization: RepaintBoundary to isolate image painting
+                    RepaintBoundary(
+                      child: Hero(
+                        tag: 'wallpaper_${widget.wallpaper.id}',
+                        child: CachedNetworkImage(
+                          imageUrl: widget.wallpaper.thumbs,
+                          fit: BoxFit.cover,
+                          memCacheWidth: 400, // Optimization: Resize image in memory
+                          placeholder: (context, url) => const ShimmerLoading(
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[900],
+                            child: const Icon(
+                              Icons.error,
+                              color: Colors.red,
+                              size: 32,
+                            ),
                           ),
                         ),
                       ),
@@ -359,8 +363,8 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                     Positioned(
                       bottom: ThemeConfig.spaceSmall,
                       right: ThemeConfig.spaceSmall,
-                      child:
-                          ClipRRect(
+                      child: RepaintBoundary( // Optimization: Isolate expensive backdrop filter
+                        child: ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
                                 child: BackdropFilter(
                                   filter: ImageFilter.blur(
@@ -474,6 +478,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                                 duration: const Duration(milliseconds: 1500),
                                 color: Colors.white.withValues(alpha: 0.3),
                               ),
+                      ),
                     ),
                   ],
                 ),
@@ -483,6 +488,7 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
         );
       },
     );
+
   }
 
   String _formatCount(int count) {
