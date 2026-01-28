@@ -11,6 +11,7 @@ import '../widgets/loading_state_widget.dart';
 import '../widgets/parallax_floating_background.dart';
 import 'search_screen.dart';
 import '../utils/constants.dart';
+import '../utils/responsive_utils.dart';
 
 class TopWallpapersScreen extends StatefulWidget {
   const TopWallpapersScreen({super.key});
@@ -143,7 +144,7 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen>
                 onRefresh: _onRefresh,
                 child: MasonryGridView.count(
                   controller: _scrollController,
-                  crossAxisCount: 2,
+                  crossAxisCount: ResponsiveUtils.getCrossAxisCount(context),
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   padding: EdgeInsets.only(

@@ -7,6 +7,7 @@ import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_empty_state.dart';
 import '../widgets/glass_pull_refresh.dart';
 import '../widgets/parallax_floating_background.dart';
+import '../utils/responsive_utils.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -86,7 +87,7 @@ class FavoritesScreen extends StatelessWidget {
               await provider.loadFavorites();
             },
             child: MasonryGridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: ResponsiveUtils.getCrossAxisCount(context),
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
               padding: EdgeInsets.only(

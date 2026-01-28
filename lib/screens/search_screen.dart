@@ -7,6 +7,7 @@ import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_search_bar.dart';
+import '../utils/responsive_utils.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? initialQuery;
@@ -205,7 +206,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   return MasonryGridView.count(
                     controller: _scrollController,
-                    crossAxisCount: 2,
+                    crossAxisCount: ResponsiveUtils.getCrossAxisCount(context),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                     padding: EdgeInsets.only(
