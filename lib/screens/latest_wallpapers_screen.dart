@@ -50,6 +50,7 @@ class _LatestWallpapersScreenState extends State<LatestWallpapersScreen>
   @override
   void dispose() {
     _scrollController.dispose();
+    _provider.dispose();
     super.dispose();
   }
 

@@ -18,17 +18,17 @@ String buildPurityString(Map<String, bool> purity) {
 /// Parse categories string to map
 Map<String, bool> parseCategoriesString(String categories) {
   return {
-    'general': categories[0] == '1',
-    'anime': categories[1] == '1',
-    'people': categories[2] == '1',
+    'general': categories.length > 0 && categories[0] == '1',
+    'anime': categories.length > 1 && categories[1] == '1',
+    'people': categories.length > 2 && categories[2] == '1',
   };
 }
 
 /// Parse purity string to map
 Map<String, bool> parsePurityString(String purity) {
   return {
-    'sfw': purity[0] == '1',
-    'sketchy': purity[1] == '1',
+    'sfw': purity.length > 0 && purity[0] == '1',
+    'sketchy': purity.length > 1 && purity[1] == '1',
     'nsfw': purity.length > 2 && purity[2] == '1',
   };
 }

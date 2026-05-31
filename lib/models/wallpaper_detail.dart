@@ -64,8 +64,8 @@ class WallpaperDetail {
       createdAt: DateTime.parse(json['created_at']),
       colors: List<String>.from(json['colors']),
       path: json['path'],
-      thumbs: json['thumbs']['large'],
-      tags: (json['tags'] as List).map((tag) => Tag.fromJson(tag)).toList(),
+      thumbs: (json['thumbs'] as Map<String, dynamic>?)?['large'] as String? ?? '',
+      tags: (json['tags'] as List?)?.map((tag) => Tag.fromJson(tag)).toList() ?? [],
       uploaderUsername: json['uploader']?['username'],
     );
   }

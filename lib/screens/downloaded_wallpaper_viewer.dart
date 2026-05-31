@@ -97,9 +97,11 @@ class DownloadedWallpaperViewer extends StatelessWidget {
             listen: false,
           ).removeDownload(downloadInfo.wallpaperId);
 
-          Navigator.pop(context); // Close viewer
-
-          ScaffoldMessenger.of(context).showSnackBar(
+          // Capture messenger before popping so it resolves against the
+          // parent route's Scaffold, not the route we are about to close.
+          final messenger = ScaffoldMessenger.of(context);
+          Navigator.pop(context);
+          messenger.showSnackBar(
             SnackBar(
               content: const Text('Wallpaper deleted'),
               backgroundColor: Colors.red,

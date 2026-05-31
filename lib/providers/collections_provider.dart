@@ -84,9 +84,14 @@ class CollectionsProvider with ChangeNotifier {
   
   String _getCategoryName(String? category) {
     if (category == null) return 'General';
-    if (category.contains('1')) return 'Anime';
-    if (category.contains('0')) return 'People';
-    return 'General';
+    switch (category.toLowerCase()) {
+      case 'anime':
+        return 'Anime';
+      case 'people':
+        return 'People';
+      default:
+        return 'General';
+    }
   }
   
   String _getResolutionCategory(String resolution) {

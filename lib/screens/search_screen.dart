@@ -228,8 +228,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       }
 
                       final wallpaper = provider.wallpapers[index];
-                      final aspectRatio =
-                          wallpaper.dimensionX / wallpaper.dimensionY;
+                      final aspectRatio = wallpaper.dimensionY > 0
+                          ? wallpaper.dimensionX / wallpaper.dimensionY
+                          : 1.0;
 
                       return AspectRatio(
                         aspectRatio: aspectRatio,

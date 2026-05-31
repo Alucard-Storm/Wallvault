@@ -23,8 +23,12 @@ class SettingsProvider with ChangeNotifier {
   bool get isLoaded => _isLoaded;
 
   // Get current theme colors
-  Color get primaryColor => AppConstants.themePresets[_themeColor]!['primary']!;
-  Color get accentColor => AppConstants.themePresets[_themeColor]!['accent']!;
+  Color get primaryColor =>
+      (AppConstants.themePresets[_themeColor] ??
+          AppConstants.themePresets['indigo']!)['primary']!;
+  Color get accentColor =>
+      (AppConstants.themePresets[_themeColor] ??
+          AppConstants.themePresets['indigo']!)['accent']!;
 
   // Load settings from storage
   Future<void> loadSettings() async {
@@ -41,7 +45,10 @@ class SettingsProvider with ChangeNotifier {
       _defaultSorting =
           prefs.getString('defaultSorting') ?? AppConstants.sortDateAdded;
       _isDarkTheme = prefs.getBool('isDarkTheme') ?? true;
-      _themeColor = prefs.getString('themeColor') ?? 'indigo';
+      final savedTheme = prefs.getString('themeColor') ?? 'indigo';
+      _themeColor = AppConstants.themePresets.containsKey(savedTheme)
+          ? savedTheme
+          : 'indigo';
       _useSystemColors = prefs.getBool('useSystemColors') ?? true;
 
       _isLoaded = true;

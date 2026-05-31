@@ -66,7 +66,7 @@ class Wallpaper {
       createdAt: DateTime.parse(json['created_at']),
       colors: List<String>.from(json['colors']),
       path: json['path'],
-      thumbs: json['thumbs']['large'],
+      thumbs: (json['thumbs'] as Map<String, dynamic>?)?['large'] as String? ?? '',
       tags: tags,
     );
   }
