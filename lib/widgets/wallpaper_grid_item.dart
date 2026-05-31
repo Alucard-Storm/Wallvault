@@ -238,53 +238,34 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                             stops: const [0.0, 0.5, 1.0],
                           ),
                         ),
-                        padding: const EdgeInsets.all(ThemeConfig.spaceSmall),
+                        // Right padding reserves space for the 40px download
+                        // button so the views row never slides under it.
+                        padding: EdgeInsets.only(
+                          left: ThemeConfig.spaceSmall,
+                          right: ThemeConfig.spaceSmall + 44,
+                          top: ThemeConfig.spaceSmall,
+                          bottom: ThemeConfig.spaceSmall,
+                        ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             // Views count (bottom left)
-                            Row(
-                              children: [
-                                if (widget.wallpaper.views > 0) ...[
-                                  Icon(
-                                    Icons.remove_red_eye,
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _formatCount(widget.wallpaper.views),
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-
-                            // Favorite indicator with animation
-                            if (isFavorite)
+                            if (widget.wallpaper.views > 0) ...[
                               Icon(
-                                    Icons.favorite,
-                                    color: Colors.red[400],
-                                    size: 20,
-                                  )
-                                  .animate(
-                                    onPlay: (controller) =>
-                                        controller.repeat(reverse: true),
-                                  )
-                                  .scale(
-                                    begin: const Offset(1.0, 1.0),
-                                    end: const Offset(1.1, 1.1),
-                                    duration: const Duration(
-                                      milliseconds: 1000,
-                                    ),
-                                  ),
+                                Icons.remove_red_eye,
+                                color: Colors.white.withValues(alpha: 0.8),
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _formatCount(widget.wallpaper.views),
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -358,6 +339,27 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                         ),
                       ),
                     ),
+
+                    // Favorite indicator (bottom left, clear of download button)
+                    if (isFavorite)
+                      Positioned(
+                        bottom: ThemeConfig.spaceSmall,
+                        left: ThemeConfig.spaceSmall,
+                        child: Icon(
+                          Icons.favorite,
+                          color: Colors.red[400],
+                          size: 20,
+                        )
+                            .animate(
+                              onPlay: (controller) =>
+                                  controller.repeat(reverse: true),
+                            )
+                            .scale(
+                              begin: const Offset(1.0, 1.0),
+                              end: const Offset(1.1, 1.1),
+                              duration: const Duration(milliseconds: 1000),
+                            ),
+                      ),
 
                     // Quick download button (bottom right) with Glass UI
                     Positioned(
