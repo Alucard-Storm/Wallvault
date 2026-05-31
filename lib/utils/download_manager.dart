@@ -185,6 +185,11 @@ class DownloadManager {
           // Error occurred
           receivePort.close();
           completer.completeError(message);
+        } else {
+          // Unrecognised message type — treat as an error so the completer
+          // is always resolved and the download queue does not hang.
+          receivePort.close();
+          completer.completeError(Exception('Unknown isolate message: $message'));
         }
       }, onError: (error) {
          receivePort.close();

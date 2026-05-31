@@ -8,7 +8,8 @@ import '../utils/constants.dart';
 // Top-level function for compute
 List<Wallpaper> _parseWallpapers(String responseBody) {
   final data = json.decode(responseBody);
-  final List wallpapers = data['data'];
+  final List? wallpapers = data['data'] as List?;
+  if (wallpapers == null) return [];
   return wallpapers.map((json) => Wallpaper.fromJson(json)).toList();
 }
 
