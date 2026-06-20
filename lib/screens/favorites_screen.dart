@@ -10,14 +10,21 @@ import '../widgets/parallax_floating_background.dart';
 import '../utils/responsive_utils.dart';
 
 class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({super.key});
+  final VoidCallback? onBrowse;
+
+  const FavoritesScreen({super.key, this.onBrowse});
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
+        appName: null,
         screenName: 'Favorites',
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           Consumer<FavoritesProvider>(
             builder: (context, provider, child) {
@@ -75,8 +82,10 @@ class FavoritesScreen extends StatelessWidget {
           if (provider.favorites.isEmpty) {
             return GlassEmptyState.favorites(
               onBrowse: () {
-                // Navigate to top wallpapers tab
-                DefaultTabController.of(context).animateTo(0);
+                Navigator.pop(context);
+                if (onBrowse != null) {
+                  onBrowse!();
+                }
               },
             );
           }

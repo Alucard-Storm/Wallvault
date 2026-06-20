@@ -7,24 +7,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:wallvault/main.dart';
+import 'package:provider/provider.dart';
+import 'package:wallvault/screens/favorites_screen.dart';
+import 'package:wallvault/providers/favorites_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const WallVaultApp());
+  testWidgets('FavoritesScreen smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ],
+        child: const MaterialApp(
+          home: FavoritesScreen(),
+        ),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify Favorites screen compiles and displays its header
+    expect(find.text('Favorites'), findsOneWidget);
   });
 }

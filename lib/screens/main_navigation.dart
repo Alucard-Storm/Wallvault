@@ -6,7 +6,7 @@ import '../providers/settings_provider.dart';
 import '../widgets/glass_nav_bar.dart';
 import 'top_wallpapers_screen.dart';
 import 'latest_wallpapers_screen.dart';
-import 'favorites_screen.dart';
+import 'random_wallpapers_screen.dart';
 import 'downloads_screen.dart';
 import 'settings_screen.dart';
 
@@ -20,17 +20,25 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
   
-  final List<Widget> _screens = [
-    const TopWallpapersScreen(),
-    const LatestWallpapersScreen(),
-    const FavoritesScreen(),
-    const DownloadsScreen(),
-    const SettingsScreen(),
-  ];
+  late final List<Widget> _screens;
   
   @override
   void initState() {
     super.initState();
+    
+    _screens = [
+      const TopWallpapersScreen(),
+      const LatestWallpapersScreen(),
+      const RandomWallpapersScreen(),
+      DownloadsScreen(
+        onBrowse: () {
+          if (mounted) {
+            setState(() => _currentIndex = 0);
+          }
+        },
+      ),
+      const SettingsScreen(),
+    ];
     
     // Load data immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -75,9 +83,9 @@ class _MainNavigationState extends State<MainNavigation> {
                   label: 'Latest',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.favorite_border),
-                  selectedIcon: Icon(Icons.favorite),
-                  label: 'Favorites',
+                  icon: Icon(Icons.shuffle),
+                  selectedIcon: Icon(Icons.shuffle),
+                  label: 'Random',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.download_outlined),

@@ -10,9 +10,12 @@ import '../widgets/glass_empty_state.dart';
 import '../widgets/glass_pull_refresh.dart';
 import '../widgets/parallax_floating_background.dart';
 import 'downloaded_wallpaper_viewer.dart';
+import 'favorites_screen.dart';
 
 class DownloadsScreen extends StatelessWidget {
-  const DownloadsScreen({super.key});
+  final VoidCallback? onBrowse;
+
+  const DownloadsScreen({super.key, this.onBrowse});
   
   @override
   Widget build(BuildContext context) {
@@ -29,8 +32,6 @@ class DownloadsScreen extends StatelessWidget {
             actions: [
           Consumer<DownloadsProvider>(
             builder: (context, provider, child) {
-              if (provider.downloads.isEmpty) return const SizedBox.shrink();
-              
               // Selection mode actions
               if (provider.isSelectionMode) {
                 return Row(
@@ -90,33 +91,50 @@ class DownloadsScreen extends StatelessWidget {
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Enter selection mode
+                  // Favorites button
                   IconButton(
-                    icon: const Icon(Icons.checklist),
-                    tooltip: 'Select',
+                    icon: const Icon(Icons.favorite_border),
+                    tooltip: 'Favorites',
                     onPressed: () {
-                      provider.toggleSelectionMode();
-                    },
-                  ),
-                  // Clear all downloads
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: 'Clear All',
-                    onPressed: () async {
-                      final result = await GlassDialog.show(
-                        context: context,
-                        title: 'Clear Downloads',
-                        content: 'Are you sure you want to clear the downloads list? '
-                            'This will not delete the files from your device.',
-                        confirmText: 'Clear',
-                        cancelText: 'Cancel',
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FavoritesScreen(
+                            onBrowse: onBrowse,
+                          ),
+                        ),
                       );
-                      
-                      if (result == true && context.mounted) {
-                        provider.clearDownloads();
-                      }
                     },
                   ),
+                  if (provider.downloads.isNotEmpty) ...[
+                    // Enter selection mode
+                    IconButton(
+                      icon: const Icon(Icons.checklist),
+                      tooltip: 'Select',
+                      onPressed: () {
+                        provider.toggleSelectionMode();
+                      },
+                    ),
+                    // Clear all downloads
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: 'Clear All',
+                      onPressed: () async {
+                        final result = await GlassDialog.show(
+                          context: context,
+                          title: 'Clear Downloads',
+                          content: 'Are you sure you want to clear the downloads list? '
+                              'This will not delete the files from your device.',
+                          confirmText: 'Clear',
+                          cancelText: 'Cancel',
+                        );
+                        
+                        if (result == true && context.mounted) {
+                          provider.clearDownloads();
+                        }
+                      },
+                    ),
+                  ],
                 ],
               );
             },
@@ -142,10 +160,7 @@ class DownloadsScreen extends StatelessWidget {
           
           if (provider.downloads.isEmpty) {
             return GlassEmptyState.downloads(
-              onBrowse: () {
-                // Navigate to top wallpapers tab
-                DefaultTabController.of(context).animateTo(0);
-              },
+              onBrowse: onBrowse,
             );
           }
           
