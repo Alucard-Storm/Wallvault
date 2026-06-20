@@ -247,8 +247,26 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                           bottom: ThemeConfig.spaceSmall,
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            // Favorite indicator
+                            if (isFavorite) ...[
+                              Icon(
+                                Icons.favorite,
+                                color: Colors.red[400],
+                                size: 16,
+                              )
+                                  .animate(
+                                    onPlay: (controller) =>
+                                        controller.repeat(reverse: true),
+                                  )
+                                  .scale(
+                                    begin: const Offset(1.0, 1.0),
+                                    end: const Offset(1.1, 1.1),
+                                    duration: const Duration(milliseconds: 1000),
+                                  ),
+                              const SizedBox(width: 6),
+                            ],
                             // Views count (bottom left)
                             if (widget.wallpaper.views > 0) ...[
                               Icon(
@@ -340,26 +358,6 @@ class _WallpaperGridItemState extends State<WallpaperGridItem> {
                       ),
                     ),
 
-                    // Favorite indicator (bottom left, clear of download button)
-                    if (isFavorite)
-                      Positioned(
-                        bottom: ThemeConfig.spaceSmall,
-                        left: ThemeConfig.spaceSmall,
-                        child: Icon(
-                          Icons.favorite,
-                          color: Colors.red[400],
-                          size: 20,
-                        )
-                            .animate(
-                              onPlay: (controller) =>
-                                  controller.repeat(reverse: true),
-                            )
-                            .scale(
-                              begin: const Offset(1.0, 1.0),
-                              end: const Offset(1.1, 1.1),
-                              duration: const Duration(milliseconds: 1000),
-                            ),
-                      ),
 
                     // Quick download button (bottom right) with Glass UI
                     Positioned(
