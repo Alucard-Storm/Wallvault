@@ -7,6 +7,7 @@ import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_search_bar.dart';
+import '../widgets/glass_empty_state.dart';
 import '../utils/responsive_utils.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -133,21 +134,10 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Consumer<WallpaperProvider>(
                 builder: (context, provider, child) {
                   if (provider.searchQuery == null) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.search, size: 64, color: Colors.grey[600]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Search for wallpapers',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const GlassEmptyState(
+                      icon: Icons.search,
+                      title: 'Discover Wallpapers',
+                      message: 'Search by keyword, tag, or paste a color hex to find the perfect wallpaper',
                     );
                   }
 
@@ -182,26 +172,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
 
                   if (provider.wallpapers.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 64,
-                            color: Colors.grey[600],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No results found',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    return GlassEmptyState.noResults(onClear: _clearSearch);
                   }
 
                   return MasonryGridView.count(

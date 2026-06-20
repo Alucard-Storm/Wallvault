@@ -426,10 +426,9 @@ class _DetailScreenState extends State<DetailScreen> {
                   _swipeEnd!,
                 );
 
-                if (direction == SwipeDirection.right ||
-                    direction == SwipeDirection.left) {
+                if (direction == SwipeDirection.right) {
                   HapticManager.swipe();
-                  // Could navigate to next/previous wallpaper if in a list context
+                  Navigator.pop(context);
                 }
               }
               _swipeStart = null;

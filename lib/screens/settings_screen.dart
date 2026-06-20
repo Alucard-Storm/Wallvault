@@ -15,6 +15,8 @@ import '../widgets/category_purity_chips.dart';
 import '../widgets/parallax_floating_background.dart';
 import '../utils/constants.dart';
 import '../utils/filter_utils.dart';
+import 'favorites_screen.dart';
+import 'downloads_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -498,6 +500,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               '${favorites.favorites.length} wallpapers',
                             ),
                             trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FavoritesScreen(),
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -511,6 +519,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               '${downloads.downloads.length} wallpapers',
                             ),
                             trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DownloadsScreen(
+                                  onBrowse: () => Navigator.pop(context),
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -538,7 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ListTile(
                         leading: Icon(Icons.info_outline),
                         title: Text('Version'),
-                        subtitle: Text('1.2.0'),
+                        subtitle: Text('1.3.0'),
                       ),
                       const Divider(height: 1),
                       ListTile(
