@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../models/wallpaper.dart';
 import '../providers/downloads_provider.dart';
+import '../providers/favorites_provider.dart';
 import '../utils/download_manager.dart';
 
 class WallpaperQuickViewer extends StatefulWidget {
@@ -35,6 +36,14 @@ class _WallpaperQuickViewerState extends State<WallpaperQuickViewer> {
   void _dismiss() {
     HapticFeedback.lightImpact();
     widget.onDismiss();
+  }
+
+  void _handleToggleFavorite(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    Provider.of<FavoritesProvider>(
+      context,
+      listen: false,
+    ).toggleFavorite(widget.wallpaper);
   }
 
   Future<void> _handleQuickDownload(BuildContext context) async {
@@ -219,6 +228,95 @@ class _WallpaperQuickViewerState extends State<WallpaperQuickViewer> {
                                               ),
                                             ),
                                           ),
+                                        ),
+                                      ),
+
+                                      // Favorite button (bottom left)
+                                      Positioned(
+                                        bottom: 8,
+                                        left: 8,
+                                        child: Consumer<FavoritesProvider>(
+                                          builder: (context, favoritesProvider, child) {
+                                            final isFavorite =
+                                                favoritesProvider.isFavorite(
+                                                  widget.wallpaper.id,
+                                                );
+
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(
+                                                  sigmaX: 10,
+                                                  sigmaY: 10,
+                                                ),
+                                                child: Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: isFavorite
+                                                        ? Colors.red
+                                                              .withValues(
+                                                                alpha: 0.2,
+                                                              )
+                                                        : Colors.white
+                                                              .withValues(
+                                                                alpha: 0.15,
+                                                              ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: Colors.white
+                                                          .withValues(
+                                                            alpha: 0.2,
+                                                          ),
+                                                      width: 1,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.1,
+                                                            ),
+                                                        blurRadius: 8,
+                                                        offset: const Offset(
+                                                          0,
+                                                          2,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      onTap: () =>
+                                                          _handleToggleFavorite(
+                                                            context,
+                                                          ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      child: Center(
+                                                        child: Icon(
+                                                          isFavorite
+                                                              ? Icons.favorite
+                                                              : Icons
+                                                                    .favorite_border,
+                                                          color: isFavorite
+                                                              ? Colors.red
+                                                              : Colors.white,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
 
