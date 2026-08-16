@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../screens/main_navigation.dart';
+import '../utils/glass_config.dart';
 import '../widgets/parallax_floating_background.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -127,12 +128,15 @@ class _SplashScreenState extends State<SplashScreen>
             // Glass container with text
             Center(
               child: LiquidGlassLayer(
-                settings: LiquidGlassSettings(
-                  thickness: 20,
-                  blur: 15,
-                  glassColor: isDark
-                      ? const Color(0x33FFFFFF)
-                      : const Color(0x33000000),
+                settings: GlassConfig.resolve(
+                  context,
+                  LiquidGlassSettings(
+                    thickness: 20,
+                    blur: 15,
+                    glassColor: isDark
+                        ? const Color(0x33FFFFFF)
+                        : const Color(0x33000000),
+                  ),
                 ),
                 child: LiquidGlass(
                   shape: const LiquidRoundedSuperellipse(borderRadius: 32),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import '../utils/glass_config.dart';
 
 /// A floating glass search bar with premium frosted glass effect
 class GlassSearchBar extends StatelessWidget {
@@ -25,12 +26,15 @@ class GlassSearchBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
-        settings: LiquidGlassSettings(
-          thickness: 18,
-          blur: 10,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x55000000)
-              : const Color(0x55FFFFFF),
+        settings: GlassConfig.resolve(
+          context,
+          LiquidGlassSettings(
+            thickness: 18,
+            blur: 10,
+            glassColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x55000000)
+                : const Color(0x55FFFFFF),
+          ),
         ),
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 24),

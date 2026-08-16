@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/animation_config.dart';
+import '../utils/glass_config.dart';
 import '../utils/haptic_manager.dart';
 
 /// Smart search suggestions bar with trending tags
@@ -97,6 +98,7 @@ class _SuggestionChipState extends State<_SuggestionChip> {
         duration: AnimationConfig.fast,
         curve: AnimationConfig.defaultCurve,
         child: LiquidGlassLayer(
+          settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(

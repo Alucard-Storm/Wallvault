@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../utils/animation_config.dart';
+import '../utils/glass_config.dart';
 import '../utils/haptic_manager.dart';
 
 /// Radial action menu that appears in a circular pattern
@@ -90,6 +91,7 @@ class _RadialActionMenuState extends State<RadialActionMenu>
   
   Widget _buildCenterButton() {
     return LiquidGlassLayer(
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
       child: Container(
         width: 60,
         height: 60,
@@ -158,6 +160,7 @@ class _RadialActionMenuState extends State<RadialActionMenu>
         item.onTap();
       },
       child: LiquidGlassLayer(
+        settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
         child: Container(
           width: 60,
           height: 60,

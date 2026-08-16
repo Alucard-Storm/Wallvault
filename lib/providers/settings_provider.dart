@@ -10,6 +10,7 @@ class SettingsProvider with ChangeNotifier {
   bool _isDarkTheme = true;
   String _themeColor = 'indigo'; // Default theme color
   bool _useSystemColors = true; // Use Material You colors when available
+  bool _reduceTransparency = false; // Disable glass/blur effects app-wide
   bool _isLoaded = false;
 
   // Getters
@@ -20,6 +21,7 @@ class SettingsProvider with ChangeNotifier {
   bool get isDarkTheme => _isDarkTheme;
   String get themeColor => _themeColor;
   bool get useSystemColors => _useSystemColors;
+  bool get reduceTransparency => _reduceTransparency;
   bool get isLoaded => _isLoaded;
 
   // Get current theme colors
@@ -50,6 +52,7 @@ class SettingsProvider with ChangeNotifier {
           ? savedTheme
           : 'indigo';
       _useSystemColors = prefs.getBool('useSystemColors') ?? true;
+      _reduceTransparency = prefs.getBool('reduceTransparency') ?? false;
 
       _isLoaded = true;
       notifyListeners();
@@ -121,6 +124,14 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Toggle reduce transparency (disables glass/blur effects app-wide)
+  Future<void> toggleReduceTransparency() async {
+    _reduceTransparency = !_reduceTransparency;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('reduceTransparency', _reduceTransparency);
+    notifyListeners();
+  }
+
   // Clear cache
   Future<void> clearCache() async {
     // This would clear image cache
@@ -136,6 +147,7 @@ class SettingsProvider with ChangeNotifier {
     _defaultSorting = AppConstants.sortDateAdded;
     _isDarkTheme = true;
     _themeColor = 'indigo';
+    _reduceTransparency = false;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('apiKey');
@@ -145,6 +157,7 @@ class SettingsProvider with ChangeNotifier {
     await prefs.remove('isDarkTheme');
     await prefs.remove('themeColor');
     await prefs.remove('useSystemColors');
+    await prefs.remove('reduceTransparency');
 
     notifyListeners();
   }

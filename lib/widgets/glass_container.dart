@@ -42,7 +42,10 @@ class GlassContainer extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final glassSettings = settings ?? GlassConfig.forTheme(context);
+    final glassSettings = GlassConfig.resolve(
+      context,
+      settings ?? GlassConfig.forTheme(context),
+    );
     
     Widget glassWidget = LiquidGlass.withOwnLayer(
       settings: glassSettings,

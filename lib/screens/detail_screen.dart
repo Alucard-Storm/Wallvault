@@ -16,6 +16,7 @@ import '../utils/wallpaper_setter.dart';
 import '../utils/theme_config.dart';
 import '../utils/haptic_manager.dart';
 import '../utils/gesture_config.dart';
+import '../utils/glass_config.dart';
 import '../widgets/animated_color_palette.dart';
 import '../widgets/wallpaper_preview_frame.dart';
 import '../widgets/glass_nav_bar.dart';
@@ -518,14 +519,17 @@ class _DetailScreenState extends State<DetailScreen> {
                                   }
 
                                   return LiquidGlassLayer(
-                                    settings: LiquidGlassSettings(
-                                      thickness: 20,
-                                      blur: 12,
-                                      glassColor:
-                                          Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? const Color(0x66000000)
-                                          : const Color(0x66FFFFFF),
+                                    settings: GlassConfig.resolve(
+                                      context,
+                                      LiquidGlassSettings(
+                                        thickness: 20,
+                                        blur: 12,
+                                        glassColor:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? const Color(0x66000000)
+                                            : const Color(0x66FFFFFF),
+                                      ),
                                     ),
                                     child: LiquidGlass(
                                       shape: const LiquidRoundedSuperellipse(
@@ -578,12 +582,15 @@ class _DetailScreenState extends State<DetailScreen> {
                             // Set Wallpaper button
                             Expanded(
                               child: LiquidGlassLayer(
-                                settings: LiquidGlassSettings(
-                                  thickness: 20,
-                                  blur: 12,
-                                  glassColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.4),
+                                settings: GlassConfig.resolve(
+                                  context,
+                                  LiquidGlassSettings(
+                                    thickness: 20,
+                                    blur: 12,
+                                    glassColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withValues(alpha: 0.4),
+                                  ),
                                 ),
                                 child: LiquidGlass(
                                   shape: const LiquidRoundedSuperellipse(
@@ -647,13 +654,16 @@ class _DetailScreenState extends State<DetailScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: LiquidGlassLayer(
-                        settings: LiquidGlassSettings(
-                          thickness: 25,
-                          blur: 15,
-                          glassColor:
-                              Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0x55000000)
-                              : const Color(0x55FFFFFF),
+                        settings: GlassConfig.resolve(
+                          context,
+                          LiquidGlassSettings(
+                            thickness: 25,
+                            blur: 15,
+                            glassColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0x55000000)
+                                : const Color(0x55FFFFFF),
+                          ),
                         ),
                         child: LiquidGlass(
                           shape: const LiquidRoundedSuperellipse(

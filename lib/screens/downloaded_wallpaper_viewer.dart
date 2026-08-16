@@ -10,6 +10,7 @@ import '../providers/downloads_provider.dart';
 import '../utils/wallpaper_setter.dart';
 import '../utils/download_manager.dart';
 import '../utils/theme_config.dart';
+import '../utils/glass_config.dart';
 import '../widgets/glass_nav_bar.dart';
 
 class DownloadedWallpaperViewer extends StatelessWidget {
@@ -206,13 +207,16 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
                   child: LiquidGlassLayer(
-                    settings: LiquidGlassSettings(
-                      thickness: 25,
-                      blur: 15,
-                      glassColor:
-                          Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0x55000000)
-                          : const Color(0x55FFFFFF),
+                    settings: GlassConfig.resolve(
+                      context,
+                      LiquidGlassSettings(
+                        thickness: 25,
+                        blur: 15,
+                        glassColor:
+                            Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0x55000000)
+                            : const Color(0x55FFFFFF),
+                      ),
                     ),
                     child: LiquidGlass(
                       shape: const LiquidRoundedSuperellipse(borderRadius: 24),
@@ -239,12 +243,15 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: LiquidGlassLayer(
-                                settings: LiquidGlassSettings(
-                                  thickness: 20,
-                                  blur: 12,
-                                  glassColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.4),
+                                settings: GlassConfig.resolve(
+                                  context,
+                                  LiquidGlassSettings(
+                                    thickness: 20,
+                                    blur: 12,
+                                    glassColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withValues(alpha: 0.4),
+                                  ),
                                 ),
                                 child: LiquidGlass(
                                   shape: const LiquidRoundedSuperellipse(

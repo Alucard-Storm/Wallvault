@@ -4,6 +4,7 @@ import '../utils/constants.dart';
 import '../utils/filter_utils.dart';
 import '../widgets/category_purity_chips.dart';
 import '../widgets/liquid_glass_chip.dart';
+import '../utils/glass_config.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final String currentCategories;
@@ -59,12 +60,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
-      settings: LiquidGlassSettings(
-        thickness: 18,
-        blur: 8,
-        glassColor: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0x33000000)
-            : const Color(0x33FFFFFF),
+      settings: GlassConfig.resolve(
+        context,
+        LiquidGlassSettings(
+          thickness: 18,
+          blur: 8,
+          glassColor: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0x33000000)
+              : const Color(0x33FFFFFF),
+        ),
       ),
       child: LiquidGlass(
         shape: const LiquidRoundedSuperellipse(borderRadius: 20),
@@ -302,12 +306,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
                 // Apply button
                 LiquidGlassLayer(
-                  settings: LiquidGlassSettings(
-                    thickness: 15,
-                    blur: 8,
-                    glassColor: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.3),
+                  settings: GlassConfig.resolve(
+                    context,
+                    LiquidGlassSettings(
+                      thickness: 15,
+                      blur: 8,
+                      glassColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: LiquidGlass(
                     shape: const LiquidRoundedSuperellipse(borderRadius: 16),

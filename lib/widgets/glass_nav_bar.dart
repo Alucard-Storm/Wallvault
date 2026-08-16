@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import '../utils/glass_config.dart';
 
 /// A floating glass navigation bar with iOS 18-style design
 class FloatingGlassNavBar extends StatefulWidget {
@@ -114,12 +115,15 @@ class _FloatingGlassNavBarState extends State<FloatingGlassNavBar>
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
-        settings: LiquidGlassSettings(
-          thickness: 20,
-          blur: 12,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x66000000)
-              : const Color(0x66FFFFFF),
+        settings: GlassConfig.resolve(
+          context,
+          LiquidGlassSettings(
+            thickness: 20,
+            blur: 12,
+            glassColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x66000000)
+                : const Color(0x66FFFFFF),
+          ),
         ),
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 28),
@@ -309,12 +313,15 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: LiquidGlassLayer(
-        settings: LiquidGlassSettings(
-          thickness: 15,
-          blur: 10,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x44000000)
-              : const Color(0x44FFFFFF),
+        settings: GlassConfig.resolve(
+          context,
+          LiquidGlassSettings(
+            thickness: 15,
+            blur: 10,
+            glassColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x44000000)
+                : const Color(0x44FFFFFF),
+          ),
         ),
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 0),

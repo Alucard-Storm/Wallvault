@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'package:provider/provider.dart';
+import '../providers/settings_provider.dart';
 
 /// Centralized configuration for liquid glass effects throughout the app
 class GlassConfig {
   // Private constructor to prevent instantiation
   GlassConfig._();
-  
+
+  /// Adjusts [settings] for the user's "Reduce Transparency" preference.
+  ///
+  /// When enabled, the glass surface becomes an opaque, flat panel: no
+  /// blur, no refraction/light artifacts, fully solid color. Every glass
+  /// call site should route its [LiquidGlassSettings] through this method
+  /// so the setting applies app-wide.
+  static LiquidGlassSettings resolve(
+    BuildContext context,
+    LiquidGlassSettings settings,
+  ) {
+    final reduceTransparency = context.watch<SettingsProvider>().reduceTransparency;
+    if (!reduceTransparency) return settings;
+
+    return settings.copyWith(
+      blur: 0,
+      chromaticAberration: 0,
+      lightIntensity: 0,
+      ambientStrength: 0,
+      refractiveIndex: 1.0,
+      glassColor: settings.glassColor.withValues(alpha: 1.0),
+    );
+  }
+
   /// Default glass settings for light backgrounds
   static const LiquidGlassSettings light = LiquidGlassSettings(
     thickness: 15,
@@ -37,9 +62,9 @@ class GlassConfig {
   /// Get glass settings based on theme brightness
   static LiquidGlassSettings forTheme(BuildContext context) {
     final brightness = Theme.of(context).brightness;
-    return brightness == Brightness.dark ? dark : light;
+    return resolve(context, brightness == Brightness.dark ? dark : light);
   }
-  
+
   /// Get glass settings with custom opacity
   static LiquidGlassSettings withOpacity(
     BuildContext context, {
@@ -48,14 +73,17 @@ class GlassConfig {
     double? blur,
   }) {
     final brightness = Theme.of(context).brightness;
-    final baseColor = brightness == Brightness.dark 
-        ? Colors.black 
+    final baseColor = brightness == Brightness.dark
+        ? Colors.black
         : Colors.white;
-    
-    return LiquidGlassSettings(
-      thickness: thickness ?? 15,
-      blur: blur ?? 8,
-      glassColor: baseColor.withValues(alpha: opacity),
+
+    return resolve(
+      context,
+      LiquidGlassSettings(
+        thickness: thickness ?? 15,
+        blur: blur ?? 8,
+        glassColor: baseColor.withValues(alpha: opacity),
+      ),
     );
   }
   

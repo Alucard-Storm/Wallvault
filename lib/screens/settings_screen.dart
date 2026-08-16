@@ -322,6 +322,20 @@ class _SettingsScreenState extends State<SettingsScreen>
                       ),
                       const Divider(height: 1),
                       ListTile(
+                        leading: const Icon(Icons.blur_off),
+                        title: const Text('Reduce Transparency'),
+                        subtitle: const Text(
+                          'Use solid backgrounds instead of glass/blur effects',
+                        ),
+                        trailing: GlassToggle(
+                          value: settings.reduceTransparency,
+                          onChanged: (value) {
+                            settings.toggleReduceTransparency();
+                          },
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
                         leading: const Icon(Icons.auto_awesome),
                         title: const Text('Use System Colors'),
                         subtitle: const Text(

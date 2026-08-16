@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/wallpaper.dart';
+import '../utils/glass_config.dart';
 
 /// A glass card showing download progress for a wallpaper
 class GlassDownloadCard extends StatelessWidget {
@@ -27,12 +28,15 @@ class GlassDownloadCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: LiquidGlassLayer(
-        settings: LiquidGlassSettings(
-          thickness: 15,
-          blur: 8,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x44000000)
-              : const Color(0x44FFFFFF),
+        settings: GlassConfig.resolve(
+          context,
+          LiquidGlassSettings(
+            thickness: 15,
+            blur: 8,
+            glassColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x44000000)
+                : const Color(0x44FFFFFF),
+          ),
         ),
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 16),

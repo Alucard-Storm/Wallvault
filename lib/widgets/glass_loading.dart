@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import '../utils/glass_config.dart';
 
 /// A glass loading indicator with frosted glass effect
 class GlassLoadingIndicator extends StatelessWidget {
@@ -12,12 +13,15 @@ class GlassLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: LiquidGlassLayer(
-        settings: LiquidGlassSettings(
-          thickness: 20,
-          blur: 12,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x66000000)
-              : const Color(0x66FFFFFF),
+        settings: GlassConfig.resolve(
+          context,
+          LiquidGlassSettings(
+            thickness: 20,
+            blur: 12,
+            glassColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x66000000)
+                : const Color(0x66FFFFFF),
+          ),
         ),
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 20),
@@ -83,12 +87,15 @@ class GlassEmptyState extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: LiquidGlassLayer(
-          settings: LiquidGlassSettings(
-            thickness: 15,
-            blur: 10,
-            glassColor: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0x44000000)
-                : const Color(0x44FFFFFF),
+          settings: GlassConfig.resolve(
+            context,
+            LiquidGlassSettings(
+              thickness: 15,
+              blur: 10,
+              glassColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x44000000)
+                  : const Color(0x44FFFFFF),
+            ),
           ),
           child: LiquidGlass(
             shape: const LiquidRoundedSuperellipse(borderRadius: 24),

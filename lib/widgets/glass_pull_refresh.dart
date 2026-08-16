@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import '../utils/glass_config.dart';
 
 /// Custom pull-to-refresh indicator with glass styling
 class GlassPullRefresh extends StatelessWidget {
@@ -61,6 +62,7 @@ class _GlassRefreshIndicatorState extends State<GlassRefreshIndicator>
     final isRefreshing = widget.progress >= 1.0;
 
     return LiquidGlassLayer(
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
       child: Container(
         width: 60,
         height: 60,

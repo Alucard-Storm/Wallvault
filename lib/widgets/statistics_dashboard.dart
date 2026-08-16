@@ -3,6 +3,7 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/animation_config.dart';
+import '../utils/glass_config.dart';
 
 /// Animated statistics dashboard widget
 class StatisticsDashboard extends StatelessWidget {
@@ -82,6 +83,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -157,8 +159,9 @@ class _CategoryBreakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = breakdown.values.fold<int>(0, (sum, value) => sum + value);
-    
+
     return LiquidGlassLayer(
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -283,6 +286,7 @@ class _ActivityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

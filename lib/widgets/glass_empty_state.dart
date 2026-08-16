@@ -3,6 +3,7 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import '../utils/animation_config.dart';
+import '../utils/glass_config.dart';
 
 /// Custom empty state widget with glass aesthetics
 class GlassEmptyState extends StatelessWidget {
@@ -93,6 +94,7 @@ class GlassEmptyState extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: LiquidGlassLayer(
+          settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
           child: Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
