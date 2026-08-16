@@ -33,10 +33,12 @@ class _TopWallpapersScreenState extends State<TopWallpapersScreen>
     super.initState();
     _provider = WallpaperProvider();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _scrollController.addListener(_onScroll);
       // Sync API key and default filters from settings to this provider instance
       final settings = context.read<SettingsProvider>();
+      await settings.loadSettings();
+      if (!mounted) return;
       _provider.setApiKey(settings.apiKey, refresh: false);
       // Use settings defaults for categories/purity but keep toplist sorting
       _provider.updateFilters(

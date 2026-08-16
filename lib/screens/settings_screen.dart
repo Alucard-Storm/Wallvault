@@ -164,11 +164,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                               IconButton(
                                 icon: const Icon(Icons.save),
                                 onPressed: () {
-                                  settings.setApiKey(_apiKeyController.text);
+                                  final trimmedKey = _apiKeyController.text
+                                      .trim();
+                                  settings.setApiKey(trimmedKey);
                                   context.read<WallpaperProvider>().setApiKey(
-                                    _apiKeyController.text.isEmpty
-                                        ? null
-                                        : _apiKeyController.text,
+                                    trimmedKey.isEmpty ? null : trimmedKey,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(

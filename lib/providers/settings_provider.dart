@@ -60,10 +60,11 @@ class SettingsProvider with ChangeNotifier {
 
   // Save API key
   Future<void> setApiKey(String? key) async {
-    _apiKey = key;
+    final trimmedKey = key?.trim();
+    _apiKey = trimmedKey;
     final prefs = await SharedPreferences.getInstance();
-    if (key != null && key.isNotEmpty) {
-      await prefs.setString('apiKey', key);
+    if (trimmedKey != null && trimmedKey.isNotEmpty) {
+      await prefs.setString('apiKey', trimmedKey);
     } else {
       await prefs.remove('apiKey');
     }
