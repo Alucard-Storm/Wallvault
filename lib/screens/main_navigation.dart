@@ -19,13 +19,16 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  
+  late final PageController _pageController;
+
   late final List<Widget> _screens;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
+    _pageController = PageController(initialPage: _currentIndex);
+
     _screens = [
       const TopWallpapersScreen(),
       const LatestWallpapersScreen(),
@@ -33,13 +36,13 @@ class _MainNavigationState extends State<MainNavigation> {
       DownloadsScreen(
         onBrowse: () {
           if (mounted) {
-            setState(() => _currentIndex = 0);
+            _goToPage(0);
           }
         },
       ),
       const SettingsScreen(),
     ];
-    
+
     // Load data immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -49,7 +52,21 @@ class _MainNavigationState extends State<MainNavigation> {
       }
     });
   }
-  
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPage(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,8 +74,11 @@ class _MainNavigationState extends State<MainNavigation> {
       body: Stack(
         children: [
           // Main content
-          IndexedStack(
-            index: _currentIndex,
+          PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _currentIndex = index);
+            },
             children: _screens,
           ),
           // Floating glass navigation bar
@@ -68,9 +88,7 @@ class _MainNavigationState extends State<MainNavigation> {
             bottom: 0,
             child: FloatingGlassNavBar(
               selectedIndex: _currentIndex,
-              onDestinationSelected: (index) {
-                setState(() => _currentIndex = index);
-              },
+              onDestinationSelected: _goToPage,
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.trending_up),
