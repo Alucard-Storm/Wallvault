@@ -12,6 +12,7 @@ class WallpaperProvider with ChangeNotifier {
   int _currentPage = 1;
   String? _error;
   String? _apiKey;
+  int _requestId = 0;
 
   // Filter options
   String _categories = AppConstants.categoryAll;
@@ -61,7 +62,10 @@ class WallpaperProvider with ChangeNotifier {
 
   // Load wallpapers
   Future<void> loadWallpapers({bool refresh = false}) async {
-    if (_isLoading) return;
+    // A plain "load more" call is dropped while a load is already running.
+    // A refresh (new filter/search/color) always supersedes whatever is
+    // in flight, so its stale response can't land after this one's.
+    if (_isLoading && !refresh) return;
 
     if (refresh) {
       _currentPage = 1;
@@ -70,6 +74,7 @@ class WallpaperProvider with ChangeNotifier {
       _error = null;
     }
 
+    final requestId = ++_requestId;
     _isLoading = true;
     notifyListeners();
 
@@ -116,6 +121,10 @@ class WallpaperProvider with ChangeNotifier {
 
       debugPrint('Loaded ${newWallpapers.length} wallpapers');
 
+      // A newer refresh superseded this request while it was in flight;
+      // applying this result now would mix results from two filters.
+      if (requestId != _requestId) return;
+
       if (newWallpapers.isEmpty) {
         _hasMore = false;
       } else {
@@ -125,11 +134,14 @@ class WallpaperProvider with ChangeNotifier {
 
       _error = null;
     } catch (e) {
+      if (requestId != _requestId) return;
       debugPrint('Error loading wallpapers: $e');
       _error = e.toString();
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (requestId == _requestId) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
