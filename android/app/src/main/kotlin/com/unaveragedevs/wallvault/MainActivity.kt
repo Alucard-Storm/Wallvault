@@ -61,12 +61,7 @@ class MainActivity : FlutterActivity() {
         val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(filePath, boundsOptions)
 
-        var sampleSize = 1
-        while (boundsOptions.outWidth / sampleSize > maxDimension ||
-            boundsOptions.outHeight / sampleSize > maxDimension
-        ) {
-            sampleSize *= 2
-        }
+        val sampleSize = computeSampleSize(boundsOptions.outWidth, boundsOptions.outHeight, maxDimension)
 
         val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
         return BitmapFactory.decodeFile(filePath, decodeOptions)
