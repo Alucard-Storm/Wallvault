@@ -1,72 +1,32 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 
+/// Slow-drifting ambient light behind a screen. Three large soft radial
+/// glows in the theme accent follow looping paths; no blur filters, so it
+/// stays cheap enough to sit behind scrolling content.
 class ParallaxFloatingBackground extends StatefulWidget {
-  final int elementCount;
-  final double minSize;
-  final double maxSize;
-  
-  const ParallaxFloatingBackground({
-    super.key,
-    this.elementCount = 12,
-    this.minSize = 80,
-    this.maxSize = 200,
-  });
+  const ParallaxFloatingBackground({super.key});
 
   @override
-  State<ParallaxFloatingBackground> createState() => _ParallaxFloatingBackgroundState();
+  State<ParallaxFloatingBackground> createState() =>
+      _ParallaxFloatingBackgroundState();
 }
 
 class _ParallaxFloatingBackgroundState extends State<ParallaxFloatingBackground>
-    with TickerProviderStateMixin {
-  late List<FloatingElement> elements;
-  late AnimationController _controller;
-  final Random _random = Random();
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 48),
+  );
 
   @override
-  void initState() {
-    super.initState();
-    _initializeElements();
-    
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 60),
-    )..repeat();
-    
-    _controller.addListener(() {
-      setState(() {
-        _updateElements();
-      });
-    });
-  }
-
-  void _initializeElements() {
-    elements = List.generate(widget.elementCount, (index) {
-      return FloatingElement(
-        x: _random.nextDouble(),
-        y: _random.nextDouble(),
-        size: widget.minSize + _random.nextDouble() * (widget.maxSize - widget.minSize),
-        speedX: (_random.nextDouble() - 0.5) * 0.0003 * (index % 3 + 1),
-        speedY: (_random.nextDouble() - 0.5) * 0.0003 * (index % 3 + 1),
-        opacity: 0.08 + _random.nextDouble() * 0.12, // Increased for better visibility
-        isCircle: _random.nextBool(),
-        colorIndex: index % 4,
-        blur: 20 + _random.nextDouble() * 40,
-      );
-    });
-  }
-
-  void _updateElements() {
-    for (var element in elements) {
-      element.x += element.speedX;
-      element.y += element.speedY;
-
-      // Wrap around screen edges
-      if (element.x > 1.2) element.x = -0.2;
-      if (element.x < -0.2) element.x = 1.2;
-      if (element.y > 1.2) element.y = -0.2;
-      if (element.y < -0.2) element.y = 1.2;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduce Motion: hold a still frame instead of drifting.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
     }
   }
 
@@ -78,96 +38,89 @@ class _ParallaxFloatingBackgroundState extends State<ParallaxFloatingBackground>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.colorScheme.primary;
-    final secondaryColor = theme.colorScheme.secondary;
-    final tertiaryColor = theme.colorScheme.tertiary;
-    
-    final colors = [
-      primaryColor,
-      secondaryColor,
-      tertiaryColor,
-      Color.lerp(primaryColor, secondaryColor, 0.5)!,
-    ];
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return RepaintBoundary(
       child: CustomPaint(
-        painter: FloatingElementsPainter(
-          elements: elements,
-          colors: colors,
-        ),
         size: Size.infinite,
+        painter: _AmbientPainter(
+          t: _controller,
+          primary: scheme.primary,
+          secondary: Color.lerp(scheme.primary, scheme.secondary, 0.5)!,
+          strength: isDark ? 0.30 : 0.18,
+          vignette: isDark ? Colors.black : Colors.white,
+        ),
       ),
     );
   }
 }
 
-class FloatingElement {
-  double x;
-  double y;
-  final double size;
-  final double speedX;
-  final double speedY;
-  final double opacity;
-  final bool isCircle;
-  final int colorIndex;
-  final double blur;
+class _AmbientPainter extends CustomPainter {
+  final Animation<double> t;
+  final Color primary;
+  final Color secondary;
+  final double strength;
+  final Color vignette;
 
-  FloatingElement({
-    required this.x,
-    required this.y,
-    required this.size,
-    required this.speedX,
-    required this.speedY,
-    required this.opacity,
-    required this.isCircle,
-    required this.colorIndex,
-    required this.blur,
-  });
-}
+  _AmbientPainter({
+    required this.t,
+    required this.primary,
+    required this.secondary,
+    required this.strength,
+    required this.vignette,
+  }) : super(repaint: t);
 
-class FloatingElementsPainter extends CustomPainter {
-  final List<FloatingElement> elements;
-  final List<Color> colors;
-
-  FloatingElementsPainter({
-    required this.elements,
-    required this.colors,
-  });
+  // (path center x, y, x/y orbit radius, phase, glow radius as share of width)
+  static const _glows = [
+    (0.25, 0.20, 0.18, 0.00, 1.05),
+    (0.80, 0.55, 0.15, 0.33, 0.90),
+    (0.30, 0.90, 0.20, 0.66, 0.95),
+  ];
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (var element in elements) {
-      // Use slightly darker/more saturated colors for better visibility
-      final baseColor = colors[element.colorIndex];
-      final enhancedColor = Color.lerp(baseColor, Colors.black, 0.2)!;
-      
-      final paint = Paint()
-        ..color = enhancedColor.withValues(alpha: element.opacity)
-        ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, element.blur);
+    final angle = t.value * 2 * pi;
 
+    for (var i = 0; i < _glows.length; i++) {
+      final (cx, cy, orbit, phase, radius) = _glows[i];
+      final a = angle + phase * 2 * pi;
       final center = Offset(
-        element.x * size.width,
-        element.y * size.height,
+        (cx + orbit * sin(a)) * size.width,
+        (cy + orbit * cos(a * (i.isEven ? 1 : -1))) * size.height,
       );
-
-      if (element.isCircle) {
-        canvas.drawCircle(center, element.size / 2, paint);
-      } else {
-        final rect = Rect.fromCenter(
-          center: center,
-          width: element.size,
-          height: element.size,
-        );
-        final rrect = RRect.fromRectAndRadius(
-          rect,
-          Radius.circular(element.size * 0.3),
-        );
-        canvas.drawRRect(rrect, paint);
-      }
+      final r = radius * size.width;
+      final color = i == 1 ? secondary : primary;
+      final paint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            color.withValues(alpha: strength),
+            color.withValues(alpha: 0),
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: r));
+      canvas.drawCircle(center, r, paint);
     }
+
+    // Soft edge falloff keeps content at the edges readable.
+    final rect = Offset.zero & size;
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = RadialGradient(
+          radius: 1.15,
+          colors: [
+            vignette.withValues(alpha: 0),
+            vignette.withValues(alpha: 0.35),
+          ],
+          stops: const [0.55, 1],
+        ).createShader(rect),
+    );
   }
 
   @override
-  bool shouldRepaint(FloatingElementsPainter oldDelegate) => true;
+  bool shouldRepaint(_AmbientPainter old) =>
+      old.primary != primary ||
+      old.secondary != secondary ||
+      old.strength != strength ||
+      old.vignette != vignette;
 }

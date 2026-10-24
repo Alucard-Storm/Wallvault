@@ -15,6 +15,7 @@ class WallpaperProvider with ChangeNotifier {
   String? _error;
   String? _apiKey;
   int _requestId = 0;
+  bool _disposed = false;
 
   // Filter options
   String _categories = AppConstants.categoryAll;
@@ -39,6 +40,18 @@ class WallpaperProvider with ChangeNotifier {
   String? get searchQuery => _searchQuery;
   String? get selectedColor => _selectedColor;
   String get ratios => _ratios;
+
+  // In-flight requests can finish after the owning screen is gone.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
   // Set API key
   void setApiKey(String? apiKey, {bool refresh = true}) {
