@@ -614,7 +614,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       ListTile(
                         leading: Icon(Icons.info_outline),
                         title: Text('Version'),
-                        subtitle: Text('1.3.0'),
+                        subtitle: Text('2.0.0'),
                       ),
                       const Divider(height: 1),
                       ListTile(
