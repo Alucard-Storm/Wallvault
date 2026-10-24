@@ -11,6 +11,7 @@ import '../providers/downloads_provider.dart';
 import '../widgets/glass_nav_bar.dart';
 import '../widgets/glass_settings_card.dart';
 import '../widgets/glass_toggle.dart';
+import '../widgets/liquid_glass_chip.dart';
 import '../widgets/category_purity_chips.dart';
 import '../widgets/parallax_floating_background.dart';
 import '../utils/constants.dart';
@@ -469,39 +470,34 @@ class _SettingsScreenState extends State<SettingsScreen>
                   GlassSettingsCard(
                     title: 'Glass Settings',
                     children: [
-                    SegmentedButton<String>(
-                      showSelectedIcon: false,
-                      style: const ButtonStyle(
-                        visualDensity: VisualDensity.compact,
-                        padding: WidgetStatePropertyAll(
-                          EdgeInsets.symmetric(horizontal: 4),
-                        ),
-                        textStyle: WidgetStatePropertyAll(
-                          TextStyle(fontSize: 13),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            const {
+                              'regular': 'Regular',
+                              'clear': 'Clear',
+                              'frosted': 'Frosted',
+                              'smoked': 'Smoked',
+                            }.entries.map((e) {
+                              return LiquidGlassChip(
+                                label: e.value,
+                                isSelected: settings.glassPreset == e.key,
+                                onTap: () => settings.setGlassPreset(e.key),
+                              );
+                            }).toList(),
+                      ),
+                      ListTile(
+                        title: const Text('Glass Tint'),
+                        subtitle: Slider(
+                          value: settings.glassTintAmount,
+                          min: 0,
+                          max: 1,
+                          divisions: 20,
+                          label: '${(settings.glassTintAmount * 100).round()}%',
+                          onChanged: settings.setGlassTintAmount,
                         ),
                       ),
-                      segments: const [
-                        ButtonSegment(value: 'regular', label: Text('Regular')),
-                        ButtonSegment(value: 'clear', label: Text('Clear')),
-                        ButtonSegment(value: 'frosted', label: Text('Frosted')),
-                        ButtonSegment(value: 'smoked', label: Text('Smoked')),
-                      ],
-                      selected: {settings.glassPreset},
-                      onSelectionChanged: (selection) {
-                        settings.setGlassPreset(selection.first);
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Glass Tint'),
-                      subtitle: Slider(
-                        value: settings.glassTintAmount,
-                        min: 0,
-                        max: 1,
-                        divisions: 20,
-                        label: '${(settings.glassTintAmount * 100).round()}%',
-                        onChanged: settings.setGlassTintAmount,
-                      ),
-                    )
                     ],
                   ),
                   const SizedBox(height: 24),

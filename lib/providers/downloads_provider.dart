@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 
@@ -9,7 +13,7 @@ class DownloadInfo {
   final DateTime downloadedAt;
   final String thumbnailUrl;
   final String resolution;
-  
+
   DownloadInfo({
     required this.wallpaperId,
     required this.filePath,
@@ -17,7 +21,7 @@ class DownloadInfo {
     required this.thumbnailUrl,
     required this.resolution,
   });
-  
+
   Map<String, dynamic> toJson() {
     return {
       'wallpaperId': wallpaperId,
@@ -27,7 +31,7 @@ class DownloadInfo {
       'resolution': resolution,
     };
   }
-  
+
   factory DownloadInfo.fromJson(Map<String, dynamic> json) {
     return DownloadInfo(
       wallpaperId: json['wallpaperId'],
@@ -49,81 +53,151 @@ class DownloadsProvider with ChangeNotifier {
   final Set<String> _queuedDownloads = {};
   bool _isSelectionMode = false;
   final Set<String> _selectedDownloads = {};
-  
+
   List<DownloadInfo> get downloads => _downloads;
   bool get isLoaded => _isLoaded;
   bool get isSelectionMode => _isSelectionMode;
   Set<String> get selectedDownloads => _selectedDownloads;
   int get selectedCount => _selectedDownloads.length;
-  
+
   // Get download progress for a wallpaper
   double? getProgress(String wallpaperId) {
     return _downloadProgress[wallpaperId];
   }
-  
+
   // Check if wallpaper is in download queue
   bool isInQueue(String wallpaperId) {
     return _queuedDownloads.contains(wallpaperId);
   }
-  
+
   // Add to queue tracking
   void addToQueue(String wallpaperId) {
     _queuedDownloads.add(wallpaperId);
     notifyListeners();
   }
-  
+
   // Remove from queue tracking
   void removeFromQueue(String wallpaperId) {
     _queuedDownloads.remove(wallpaperId);
     notifyListeners();
   }
-  
+
   // Load downloads from storage
   Future<void> loadDownloads() async {
     if (_isLoaded) return;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? downloadsJson = prefs.getString(AppConstants.keyDownloads);
-      
+
       if (downloadsJson != null) {
         final List<dynamic> decoded = json.decode(downloadsJson);
-        _downloads = decoded.map((json) => DownloadInfo.fromJson(json)).toList();
+        _downloads = decoded
+            .map((json) => DownloadInfo.fromJson(json))
+            .toList();
         _downloadedIds
           ..clear()
           ..addAll(_downloads.map((d) => d.wallpaperId));
       }
-      
+
+      // After a reinstall the saved list (and the app-private files) are
+      // gone, but the gallery copies survive in Pictures/WallVault. Merge
+      // them in once; later deletes shouldn't be undone by rescanning.
+      if (!(prefs.getBool(_keyGalleryScanned) ?? false) &&
+          await _recoverFromGallery()) {
+        await prefs.setBool(_keyGalleryScanned, true);
+      }
+
       _isLoaded = true;
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading downloads: $e');
     }
   }
-  
+
+  static const _keyGalleryScanned = 'gallery_scanned';
+  static final _galleryFile = RegExp(r'^wallvault_(\w+)\.\w+$');
+
+  // Rebuild the downloads list from the WallVault gallery album
+  Future<bool> _recoverFromGallery() async {
+    try {
+      if (!await Permission.photos.request().isGranted) return false;
+
+      final dir = Directory('/storage/emulated/0/Pictures/WallVault');
+      if (!await dir.exists()) return true;
+
+      final recovered = <DownloadInfo>[];
+      await for (final entity in dir.list()) {
+        if (entity is! File) continue;
+        final id = _galleryFile
+            .firstMatch(entity.uri.pathSegments.last)
+            ?.group(1);
+        if (id == null || _downloadedIds.contains(id)) continue;
+
+        recovered.add(
+          DownloadInfo(
+            wallpaperId: id,
+            filePath: entity.path,
+            downloadedAt: (await entity.stat()).modified,
+            thumbnailUrl:
+                'https://th.wallhaven.cc/lg/${id.substring(0, 2)}/$id.jpg',
+            resolution: await _imageResolution(entity),
+          ),
+        );
+      }
+
+      if (recovered.isNotEmpty) {
+        _downloads = [..._downloads, ...recovered]
+          ..sort((a, b) => b.downloadedAt.compareTo(a.downloadedAt));
+        _downloadedIds.addAll(recovered.map((d) => d.wallpaperId));
+        await _saveDownloads();
+      }
+      return true;
+    } catch (e) {
+      debugPrint('Error recovering downloads from gallery: $e');
+      return false;
+    }
+  }
+
+  Future<String> _imageResolution(File file) async {
+    try {
+      final buffer = await ui.ImmutableBuffer.fromUint8List(
+        await file.readAsBytes(),
+      );
+      final descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final resolution = '${descriptor.width}x${descriptor.height}';
+      descriptor.dispose();
+      buffer.dispose();
+      return resolution;
+    } catch (_) {
+      return '';
+    }
+  }
+
   // Save downloads to storage
   Future<void> _saveDownloads() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final List<Map<String, dynamic>> encoded = 
-          _downloads.map((download) => download.toJson()).toList();
+      final List<Map<String, dynamic>> encoded = _downloads
+          .map((download) => download.toJson())
+          .toList();
       await prefs.setString(AppConstants.keyDownloads, json.encode(encoded));
     } catch (e) {
       debugPrint('Error saving downloads: $e');
     }
   }
-  
+
   // Check if wallpaper is downloaded
   bool isDownloaded(String wallpaperId) {
     return _downloadedIds.contains(wallpaperId);
   }
-  
+
   // Update download progress
   void updateProgress(String wallpaperId, double progress) {
     _downloadProgress[wallpaperId] = progress;
     notifyListeners();
   }
-  
+
   // Add download
   Future<void> addDownload(DownloadInfo download) async {
     if (!isDownloaded(download.wallpaperId)) {
@@ -142,7 +216,7 @@ class DownloadsProvider with ChangeNotifier {
     await _saveDownloads();
     notifyListeners();
   }
-  
+
   // Get download info
   DownloadInfo? getDownloadInfo(String wallpaperId) {
     try {
@@ -151,7 +225,7 @@ class DownloadsProvider with ChangeNotifier {
       return null;
     }
   }
-  
+
   // Toggle selection mode
   void toggleSelectionMode() {
     _isSelectionMode = !_isSelectionMode;
@@ -160,14 +234,14 @@ class DownloadsProvider with ChangeNotifier {
     }
     notifyListeners();
   }
-  
+
   // Exit selection mode
   void exitSelectionMode() {
     _isSelectionMode = false;
     _selectedDownloads.clear();
     notifyListeners();
   }
-  
+
   // Toggle selection for a download
   void toggleSelection(String wallpaperId) {
     if (_selectedDownloads.contains(wallpaperId)) {
@@ -177,25 +251,25 @@ class DownloadsProvider with ChangeNotifier {
     }
     notifyListeners();
   }
-  
+
   // Check if a download is selected
   bool isSelected(String wallpaperId) {
     return _selectedDownloads.contains(wallpaperId);
   }
-  
+
   // Select all downloads
   void selectAll() {
     _selectedDownloads.clear();
     _selectedDownloads.addAll(_downloads.map((d) => d.wallpaperId));
     notifyListeners();
   }
-  
+
   // Clear selection
   void clearSelection() {
     _selectedDownloads.clear();
     notifyListeners();
   }
-  
+
   // Delete selected downloads
   Future<void> deleteSelected() async {
     _downloads.removeWhere((d) => _selectedDownloads.contains(d.wallpaperId));
