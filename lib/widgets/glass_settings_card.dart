@@ -40,7 +40,9 @@ class GlassSettingsCard extends StatelessWidget {
                   : const Color(0x80F5F5F5),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -53,6 +55,7 @@ class GlassSettingsCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 ...children,
               ],
+              ),
             ),
           ),
         ),

@@ -68,12 +68,15 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startAnimationSequence() async {
     // Wait a bit before starting
     await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
 
     // Start typing animation
     await _typingController.forward();
+    if (!mounted) return;
 
     // Keep the full text visible for a moment
     await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
 
     // Stop cursor blinking
     _cursorController.stop();
@@ -83,6 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Wait a bit more
     await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
 
     // Fade out
     await _fadeController.forward();

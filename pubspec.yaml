@@ -33,7 +33,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
   
   # HTTP client for API calls
   http: ^1.2.0
@@ -42,12 +42,12 @@ dependencies:
   provider: ^6.1.1
   
   # Image loading and caching
-  cached_network_image: ^3.3.1
+  cached_network_image: ^4.0.4
   flutter_cache_manager: ^3.3.1
   
   # Storage and file management
   path_provider: ^2.1.2
-  permission_handler: ^11.3.0
+  permission_handler: ^13.0.2
   shared_preferences: ^2.2.2
   
   
@@ -59,16 +59,16 @@ dependencies:
   
   # Utilities
   url_launcher: ^6.2.4
-  photo_view: ^0.14.0
+  photo_view: ^0.15.0
   
   # Material You dynamic colors
-  dynamic_color: ^1.7.0
+  dynamic_color: ^1.9.0
   
   # Download notifications
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^22.3.1
   
   # Shimmer loading
-  shimmer: ^3.0.0
+  shimmer: ^4.0.0
   
   # Google Fonts
   google_fonts: ^6.1.0
@@ -77,25 +77,25 @@ dependencies:
   flutter_animate: ^4.5.0
   
   # Haptic feedback
-  vibration: ^2.0.0
+  vibration: ^3.2.1
   
   # Share functionality
-  share_plus: ^10.1.2
+  share_plus: ^13.3.1
   
   # Lottie animations
   lottie: ^3.1.0
   
   # Device info for Android version
-  device_info_plus: ^11.1.0
+  device_info_plus: ^13.3.0
   
   # Liquid glass UI effects
   liquid_glass_renderer: ^0.2.0-dev.4
   
   # Advanced animations and interactions
   carousel_slider: ^5.0.0
-  fl_chart: ^0.69.0
-  confetti: ^0.7.0
-  animations: ^2.0.11
+  fl_chart: ^1.2.0
+  confetti: ^0.8.0
+  animations: ^3.0.0
   page_view_dot_indicator: ^2.3.0
 
 dev_dependencies:

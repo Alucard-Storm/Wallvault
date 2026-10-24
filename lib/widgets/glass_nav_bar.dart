@@ -324,7 +324,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         child: LiquidGlass(
-          shape: const LiquidRoundedSuperellipse(borderRadius: 0),
+          shape: const LiquidRoundedSuperellipse(borderRadius: 1),
           child: AppBar(
             title: Column(
               mainAxisSize: MainAxisSize.min,
