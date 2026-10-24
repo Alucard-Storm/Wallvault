@@ -115,17 +115,16 @@ class _FloatingGlassNavBarState extends State<FloatingGlassNavBar>
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(
-          context,
-          LiquidGlassSettings(
-            thickness: 20,
-            blur: 12,
-            glassColor: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0x66000000)
-                : const Color(0x66FFFFFF),
-          ),
-        ),
+        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 12)),
         child: LiquidGlass(
+          appearance: GlassConfig.resolveAppearance(
+            context,
+            LiquidGlassAppearance(
+              tint: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x66000000)
+                  : const Color(0x66FFFFFF),
+            ),
+          ),
           shape: const LiquidRoundedSuperellipse(borderRadius: 28),
           child: Container(
             height: 74,
@@ -313,17 +312,16 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(
-          context,
-          LiquidGlassSettings(
-            thickness: 15,
-            blur: 10,
-            glassColor: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0x44000000)
-                : const Color(0x44FFFFFF),
-          ),
-        ),
+        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 10)),
         child: LiquidGlass(
+          appearance: GlassConfig.resolveAppearance(
+            context,
+            LiquidGlassAppearance(
+              tint: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x44000000)
+                  : const Color(0x44FFFFFF),
+            ),
+          ),
           shape: const LiquidRoundedSuperellipse(borderRadius: 1),
           child: AppBar(
             title: Column(

@@ -13,17 +13,16 @@ class GlassLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(
-          context,
-          LiquidGlassSettings(
-            thickness: 20,
-            blur: 12,
-            glassColor: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0x66000000)
-                : const Color(0x66FFFFFF),
-          ),
-        ),
+        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 12)),
         child: LiquidGlass(
+          appearance: GlassConfig.resolveAppearance(
+            context,
+            LiquidGlassAppearance(
+              tint: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x66000000)
+                  : const Color(0x66FFFFFF),
+            ),
+          ),
           shape: const LiquidRoundedSuperellipse(borderRadius: 20),
           child: Container(
             padding: const EdgeInsets.all(24),
@@ -87,17 +86,16 @@ class GlassEmptyState extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: LiquidGlassLayer(
-          settings: GlassConfig.resolve(
-            context,
-            LiquidGlassSettings(
-              thickness: 15,
-              blur: 10,
-              glassColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x44000000)
-                  : const Color(0x44FFFFFF),
-            ),
-          ),
+          settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 10)),
           child: LiquidGlass(
+            appearance: GlassConfig.resolveAppearance(
+              context,
+              LiquidGlassAppearance(
+                tint: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x44000000)
+                    : const Color(0x44FFFFFF),
+              ),
+            ),
             shape: const LiquidRoundedSuperellipse(borderRadius: 24),
             child: Container(
               padding: const EdgeInsets.all(32),

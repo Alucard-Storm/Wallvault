@@ -209,16 +209,17 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                   child: LiquidGlassLayer(
                     settings: GlassConfig.resolve(
                       context,
-                      LiquidGlassSettings(
-                        thickness: 25,
-                        blur: 15,
-                        glassColor:
-                            Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0x55000000)
-                            : const Color(0x55FFFFFF),
-                      ),
+                      const LiquidGlassSettings(frost: 15),
                     ),
                     child: LiquidGlass(
+                      appearance: GlassConfig.resolveAppearance(
+                        context,
+                        LiquidGlassAppearance(
+                          tint: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0x55000000)
+                              : const Color(0x55FFFFFF),
+                        ),
+                      ),
                       shape: const LiquidRoundedSuperellipse(borderRadius: 24),
                       child: Container(
                         width: double.infinity,
@@ -245,15 +246,17 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                               child: LiquidGlassLayer(
                                 settings: GlassConfig.resolve(
                                   context,
-                                  LiquidGlassSettings(
-                                    thickness: 20,
-                                    blur: 12,
-                                    glassColor: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withValues(alpha: 0.4),
-                                  ),
+                                  const LiquidGlassSettings(frost: 12),
                                 ),
                                 child: LiquidGlass(
+                                  appearance: GlassConfig.resolveAppearance(
+                                    context,
+                                    LiquidGlassAppearance(
+                                      tint: Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withValues(alpha: 0.4),
+                                    ),
+                                  ),
                                   shape: const LiquidRoundedSuperellipse(
                                     borderRadius: 24,
                                   ),

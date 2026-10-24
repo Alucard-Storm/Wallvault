@@ -60,17 +60,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(
-        context,
-        LiquidGlassSettings(
-          thickness: 18,
-          blur: 8,
-          glassColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0x33000000)
-              : const Color(0x33FFFFFF),
-        ),
-      ),
+      settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 8)),
       child: LiquidGlass(
+        appearance: GlassConfig.resolveAppearance(
+          context,
+          LiquidGlassAppearance(
+            tint: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x33000000)
+                : const Color(0x33FFFFFF),
+          ),
+        ),
         shape: const LiquidRoundedSuperellipse(borderRadius: 20),
         child: Container(
           padding: const EdgeInsets.all(20),
@@ -306,17 +305,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
                 // Apply button
                 LiquidGlassLayer(
-                  settings: GlassConfig.resolve(
-                    context,
-                    LiquidGlassSettings(
-                      thickness: 15,
-                      blur: 8,
-                      glassColor: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.3),
-                    ),
-                  ),
+                  settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 8)),
                   child: LiquidGlass(
+                    appearance: GlassConfig.resolveAppearance(
+                      context,
+                      LiquidGlassAppearance(
+                        tint: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.3),
+                      ),
+                    ),
                     shape: const LiquidRoundedSuperellipse(borderRadius: 16),
                     child: SizedBox(
                       width: double.infinity,

@@ -22,7 +22,10 @@ class DownloadProgressOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: Colors.black.withValues(alpha: 0.6),
       ),
-      child: LiquidGlass(
+      // No ancestor LiquidGlassLayer here, and the real shader only works
+      // on Impeller anyway (Skia renders it as a broken mirror), so this
+      // uses FakeGlass directly rather than LiquidGlass.
+      child: LiquidGlass.withOwnLayer(
         shape: LiquidRoundedSuperellipse(borderRadius: 30),
         child: Center(
           child: isComplete

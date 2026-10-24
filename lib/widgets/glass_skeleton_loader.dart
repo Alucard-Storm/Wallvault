@@ -107,7 +107,11 @@ class _GlassSkeletonLoaderState extends State<GlassSkeletonLoader>
             borderRadius: widget.isCircle
                 ? BorderRadius.circular(widget.width / 2)
                 : (widget.borderRadius ?? BorderRadius.zero),
-            child: LiquidGlass(
+            // No ancestor LiquidGlassLayer here, and the real shader only
+            // works on Impeller anyway (Skia renders it as a broken
+            // mirror), so this uses FakeGlass directly rather than
+            // LiquidGlass.
+            child: LiquidGlass.withOwnLayer(
               shape: LiquidRoundedSuperellipse(borderRadius: 30),
               child: Container(),
             ),
