@@ -10,7 +10,17 @@ List<Wallpaper> _parseWallpapers(String responseBody) {
   final data = json.decode(responseBody);
   final List? wallpapers = data['data'] as List?;
   if (wallpapers == null) return [];
-  return wallpapers.map((json) => Wallpaper.fromJson(json)).toList();
+
+  final parsed = <Wallpaper>[];
+  for (final item in wallpapers) {
+    try {
+      parsed.add(Wallpaper.fromJson(item));
+    } catch (e) {
+      // Skip just this one malformed item instead of failing the whole page.
+      debugPrint('Skipping malformed wallpaper entry: $e');
+    }
+  }
+  return parsed;
 }
 
 // Top-level function for compute
@@ -21,6 +31,7 @@ WallpaperDetail _parseWallpaperDetail(String responseBody) {
 
 class WallhavenApi {
   static const String _baseUrl = AppConstants.wallhavenBaseUrl;
+  static const Duration _requestTimeout = Duration(seconds: 15);
   
   // Build query parameters
   Map<String, String> _buildParams(Map<String, dynamic> params, {String? apiKey}) {
@@ -68,7 +79,7 @@ class WallhavenApi {
       }, apiKey: apiKey);
       
       final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
-      final response = await http.get(uri);
+      final response = await http.get(uri).timeout(_requestTimeout);
       
       if (response.statusCode == 200) {
         // Use compute to parse JSON in a background isolate
@@ -110,7 +121,7 @@ class WallhavenApi {
       }, apiKey: apiKey);
       
       final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
-      final response = await http.get(uri);
+      final response = await http.get(uri).timeout(_requestTimeout);
       
       if (response.statusCode == 200) {
         // Use compute to parse JSON in a background isolate
@@ -147,7 +158,7 @@ class WallhavenApi {
     try {
       final params = _buildParams({}, apiKey: apiKey);
       final uri = Uri.parse('$_baseUrl/w/$id').replace(queryParameters: params);
-      final response = await http.get(uri);
+      final response = await http.get(uri).timeout(_requestTimeout);
       
       if (response.statusCode == 200) {
         // Use compute to parse JSON in a background isolate

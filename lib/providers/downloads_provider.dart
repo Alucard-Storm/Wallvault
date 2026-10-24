@@ -41,6 +41,9 @@ class DownloadInfo {
 
 class DownloadsProvider with ChangeNotifier {
   List<DownloadInfo> _downloads = [];
+  // Mirrors _downloads' ids for O(1) isDownloaded() lookups instead of an
+  // O(n) scan on every grid item's build.
+  final Set<String> _downloadedIds = {};
   bool _isLoaded = false;
   final Map<String, double> _downloadProgress = {};
   final Set<String> _queuedDownloads = {};
@@ -86,6 +89,9 @@ class DownloadsProvider with ChangeNotifier {
       if (downloadsJson != null) {
         final List<dynamic> decoded = json.decode(downloadsJson);
         _downloads = decoded.map((json) => DownloadInfo.fromJson(json)).toList();
+        _downloadedIds
+          ..clear()
+          ..addAll(_downloads.map((d) => d.wallpaperId));
       }
       
       _isLoaded = true;
@@ -109,7 +115,7 @@ class DownloadsProvider with ChangeNotifier {
   
   // Check if wallpaper is downloaded
   bool isDownloaded(String wallpaperId) {
-    return _downloads.any((d) => d.wallpaperId == wallpaperId);
+    return _downloadedIds.contains(wallpaperId);
   }
   
   // Update download progress
@@ -122,15 +128,17 @@ class DownloadsProvider with ChangeNotifier {
   Future<void> addDownload(DownloadInfo download) async {
     if (!isDownloaded(download.wallpaperId)) {
       _downloads.insert(0, download);
+      _downloadedIds.add(download.wallpaperId);
       await _saveDownloads();
       _downloadProgress.remove(download.wallpaperId);
       notifyListeners();
     }
   }
-  
+
   // Remove download
   Future<void> removeDownload(String wallpaperId) async {
     _downloads.removeWhere((d) => d.wallpaperId == wallpaperId);
+    _downloadedIds.remove(wallpaperId);
     await _saveDownloads();
     notifyListeners();
   }
@@ -191,15 +199,17 @@ class DownloadsProvider with ChangeNotifier {
   // Delete selected downloads
   Future<void> deleteSelected() async {
     _downloads.removeWhere((d) => _selectedDownloads.contains(d.wallpaperId));
+    _downloadedIds.removeAll(_selectedDownloads);
     _selectedDownloads.clear();
     _isSelectionMode = false;
     await _saveDownloads();
     notifyListeners();
   }
-  
+
   // Clear all downloads
   Future<void> clearDownloads() async {
     _downloads.clear();
+    _downloadedIds.clear();
     _selectedDownloads.clear();
     _isSelectionMode = false;
     await _saveDownloads();
