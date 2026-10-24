@@ -77,6 +77,14 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
+  static const _destinations = [
+    NavBarTab(icon: Icons.trending_up, label: 'Top'),
+    NavBarTab(icon: Icons.access_time, label: 'Latest'),
+    NavBarTab(icon: Icons.shuffle, label: 'Random'),
+    NavBarTab(icon: Icons.download_outlined, label: 'Downloads'),
+    NavBarTab(icon: Icons.settings_outlined, label: 'Settings'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,33 +107,7 @@ class _MainNavigationState extends State<MainNavigation> {
             child: FloatingGlassNavBar(
               selectedIndex: _currentIndex,
               onDestinationSelected: _goToPage,
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.trending_up),
-                  selectedIcon: Icon(Icons.trending_up),
-                  label: 'Top',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.access_time),
-                  selectedIcon: Icon(Icons.access_time),
-                  label: 'Latest',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.shuffle),
-                  selectedIcon: Icon(Icons.shuffle),
-                  label: 'Random',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.download_outlined),
-                  selectedIcon: Icon(Icons.download),
-                  label: 'Downloads',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  selectedIcon: Icon(Icons.settings),
-                  label: 'Settings',
-                ),
-              ],
+              destinations: _destinations,
             ),
           ),
         ],

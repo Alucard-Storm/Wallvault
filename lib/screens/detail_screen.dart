@@ -20,6 +20,7 @@ import '../utils/glass_config.dart';
 import '../widgets/animated_color_palette.dart';
 import '../widgets/wallpaper_preview_frame.dart';
 import '../widgets/glass_nav_bar.dart';
+import '../widgets/glass/control_glass.dart';
 import 'search_screen.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -523,53 +524,57 @@ class _DetailScreenState extends State<DetailScreen> {
                                       context,
                                       const LiquidGlassSettings(frost: 12),
                                     ),
-                                    child: LiquidGlass(
-                                      appearance: GlassConfig.resolveAppearance(
-                                        context,
-                                        LiquidGlassAppearance(
-                                          tint:
-                                              Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? const Color(0x66000000)
-                                              : const Color(0x66FFFFFF),
-                                        ),
-                                      ),
-                                      shape: const LiquidRoundedSuperellipse(
-                                        borderRadius: 24,
-                                      ),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: isDisabled
-                                              ? null
-                                              : _downloadWallpaper,
-                                          borderRadius: BorderRadius.circular(
-                                            24,
+                                    child: LiquidStretch(
+                                      child: LiquidGlass(
+                                        appearance: GlassConfig.resolveAppearance(
+                                          context,
+                                          LiquidGlassAppearance(
+                                            tint:
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? const Color(0x66000000)
+                                                : const Color(0x66FFFFFF),
                                           ),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 16,
-                                              horizontal: 20,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  buttonIcon,
-                                                  color: Colors.white,
-                                                  size: 20,
+                                        ),
+                                        shape: const LiquidRoundedSuperellipse(
+                                          borderRadius: 24,
+                                        ),
+                                        child: GlowContent(
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              onTap: isDisabled
+                                                  ? null
+                                                  : _downloadWallpaper,
+                                              borderRadius: BorderRadius.circular(
+                                                24,
+                                              ),
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  vertical: 16,
+                                                  horizontal: 20,
                                                 ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  buttonText,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      buttonIcon,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      buttonText,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -588,51 +593,55 @@ class _DetailScreenState extends State<DetailScreen> {
                                   context,
                                   const LiquidGlassSettings(frost: 12),
                                 ),
-                                child: LiquidGlass(
-                                  appearance: GlassConfig.resolveAppearance(
-                                    context,
-                                    LiquidGlassAppearance(
-                                      tint: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withValues(alpha: 0.4),
+                                child: LiquidStretch(
+                                  child: LiquidGlass(
+                                    appearance: GlassConfig.resolveAppearance(
+                                      context,
+                                      LiquidGlassAppearance(
+                                        tint: Theme.of(
+                                          context,
+                                        ).colorScheme.primary.withValues(alpha: 0.4),
+                                      ),
                                     ),
-                                  ),
-                                  shape: const LiquidRoundedSuperellipse(
-                                    borderRadius: 24,
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: _setWallpaper,
-                                      borderRadius: BorderRadius.circular(24),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 16,
-                                          horizontal: 20,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.wallpaper,
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
-                                              size: 20,
+                                    shape: const LiquidRoundedSuperellipse(
+                                      borderRadius: 24,
+                                    ),
+                                    child: GlowContent(
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: _setWallpaper,
+                                          borderRadius: BorderRadius.circular(24),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 16,
+                                              horizontal: 20,
                                             ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Set Wallpaper',
-                                              style: TextStyle(
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.primary,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.wallpaper,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  size: 20,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  'Set Wallpaper',
+                                                  style: TextStyle(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -643,9 +652,9 @@ class _DetailScreenState extends State<DetailScreen> {
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                  ],
                 ),
+              ),
 
                 // Glass details section below the image
                 Expanded(

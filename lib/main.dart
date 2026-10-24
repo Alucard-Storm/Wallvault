@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'providers/wallpaper_provider.dart';
 import 'providers/favorites_provider.dart';
 import 'providers/downloads_provider.dart';
@@ -212,6 +213,11 @@ class WallVaultApp extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Lets any GlassGlow-wrapped control, on any screen or
+                // pushed route, share one touch-reactive glow layer.
+                builder: (context, child) =>
+                    GlassGlowLayer(child: child ?? const SizedBox.shrink()),
 
                 home: const SplashScreen(),
               );

@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import '../utils/glass_config.dart';
+import 'glass/loupe_tab_bar.dart';
 
-/// A floating glass navigation bar with iOS 18-style design
-class FloatingGlassNavBar extends StatefulWidget {
+/// A single destination in [FloatingGlassNavBar].
+@immutable
+class NavBarTab {
+  const NavBarTab({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+}
+
+/// A floating glass navigation bar with Apple's iOS 27 loupe tab bar effect:
+/// a glass capsule whose selection platter turns into a magnifying loupe
+/// that follows the finger while held, and springs to the nearest tab on
+/// release.
+class FloatingGlassNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
-  final List<NavigationDestination> destinations;
+  final List<NavBarTab> destinations;
 
   const FloatingGlassNavBar({
     super.key,
@@ -15,100 +28,9 @@ class FloatingGlassNavBar extends StatefulWidget {
     required this.destinations,
   });
 
-  @override
-  State<FloatingGlassNavBar> createState() => _FloatingGlassNavBarState();
-}
-
-class _FloatingGlassNavBarState extends State<FloatingGlassNavBar>
-    with TickerProviderStateMixin {
-  late List<AnimationController> _iconControllers;
-  late List<Animation<double>> _iconScaleAnimations;
-  late List<Animation<double>> _iconRotationAnimations;
-  late AnimationController _bubbleAnimationController;
-  late Animation<double> _bubbleSquashAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeAnimations();
-  }
-
-  void _initializeAnimations() {
-    _iconControllers = List.generate(
-      widget.destinations.length,
-      (index) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 400),
-      ),
-    );
-
-    _iconScaleAnimations = _iconControllers.map((controller) {
-      return Tween<double>(
-        begin: 1.0,
-        end: 1.2,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.elasticOut));
-    }).toList();
-
-    _iconRotationAnimations = _iconControllers.map((controller) {
-      return Tween<double>(
-        begin: 0.0,
-        end: 0.1,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
-    }).toList();
-
-    // Bubble squash and stretch animation
-    _bubbleAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-
-    _bubbleSquashAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.0,
-          end: 0.96,
-        ).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 35,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 0.96,
-          end: 1.04,
-        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
-        weight: 35,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.04,
-          end: 1.0,
-        ).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 30,
-      ),
-    ]).animate(_bubbleAnimationController);
-  }
-
-  @override
-  void didUpdateWidget(FloatingGlassNavBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedIndex != widget.selectedIndex) {
-      // Animate the bubble squash and stretch
-      _bubbleAnimationController.forward(from: 0.0);
-
-      // Animate the newly selected icon
-      _iconControllers[widget.selectedIndex].forward().then((_) {
-        _iconControllers[widget.selectedIndex].reverse();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    for (var controller in _iconControllers) {
-      controller.dispose();
-    }
-    _bubbleAnimationController.dispose();
-    super.dispose();
-  }
+  static const _shadows = [
+    BoxShadow(color: Color(0x1F000000), blurRadius: 24, offset: Offset(0, 8)),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -116,163 +38,24 @@ class _FloatingGlassNavBarState extends State<FloatingGlassNavBar>
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
         settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 12)),
-        child: LiquidGlass(
-          appearance: GlassConfig.resolveAppearance(
-            context,
-            LiquidGlassAppearance(
-              tint: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x66000000)
-                  : const Color(0x66FFFFFF),
-            ),
-          ),
-          shape: const LiquidRoundedSuperellipse(borderRadius: 28),
-          child: Container(
-            height: 74,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Stack(
-                  children: [
-                    // Animated selection bubble
-                    _buildSelectionBubble(context, constraints.maxWidth),
-                    // Navigation items
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(
-                        widget.destinations.length,
-                        (index) => _buildNavItem(
-                          context,
-                          widget.destinations[index],
-                          index,
-                          widget.selectedIndex == index,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSelectionBubble(BuildContext context, double containerWidth) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final itemWidth = containerWidth / widget.destinations.length;
-
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeInOutCubic,
-      left: itemWidth * widget.selectedIndex,
-      top: 0,
-      bottom: 0,
-      width: itemWidth,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: AnimatedBuilder(
-          animation: _bubbleSquashAnimation,
-          builder: (context, child) {
-            final squashValue = _bubbleSquashAnimation.value;
-
-            return Transform.scale(
-              scale: squashValue,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primary.withValues(alpha: 0.15),
-                      colorScheme.primary.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    BuildContext context,
-    NavigationDestination destination,
-    int index,
-    bool isSelected,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = isSelected
-        ? colorScheme.primary
-        : colorScheme.onSurface.withValues(alpha: 0.6);
-
-    return Expanded(
-      child: InkWell(
-        onTap: () => widget.onDestinationSelected(index),
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedBuilder(
-                animation: _iconControllers[index],
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _iconScaleAnimations[index].value,
-                    child: Transform.rotate(
-                      angle: _iconRotationAnimations[index].value,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        transitionBuilder: (child, animation) {
-                          return ScaleTransition(
-                            scale: animation,
-                            child: FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: IconTheme(
-                          key: ValueKey('$index-$isSelected'),
-                          data: IconThemeData(color: color, size: 24),
-                          child: isSelected
-                              ? (destination.selectedIcon ?? destination.icon)
-                              : destination.icon,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 4),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutCubic,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: color,
-                  height: 1.2,
-                ),
-                child: Text(
-                  destination.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                ),
-              ),
+        child: LiquidGlassBlendGroup(
+          blend: 5,
+          child: LoupeTabBar(
+            tabs: [
+              for (final tab in destinations)
+                BottomBarTab(icon: tab.icon, label: tab.label),
             ],
+            selectedIndex: selectedIndex,
+            onSelected: onDestinationSelected,
+            shadows: _shadows,
+            appearance: GlassConfig.resolveAppearance(
+              context,
+              LiquidGlassAppearance(
+                tint: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x66000000)
+                    : const Color(0x66FFFFFF),
+              ),
+            ),
           ),
         ),
       ),
