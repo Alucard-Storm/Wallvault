@@ -83,7 +83,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+      settings: GlassConfig.settingsForPreset(context),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -161,7 +161,7 @@ class _CategoryBreakdown extends StatelessWidget {
     final total = breakdown.values.fold<int>(0, (sum, value) => sum + value);
 
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+      settings: GlassConfig.settingsForPreset(context),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -286,7 +286,7 @@ class _ActivityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+      settings: GlassConfig.settingsForPreset(context),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

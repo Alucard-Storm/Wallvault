@@ -91,7 +91,7 @@ class _RadialActionMenuState extends State<RadialActionMenu>
   
   Widget _buildCenterButton() {
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+      settings: GlassConfig.settingsForPreset(context),
       child: Container(
         width: 60,
         height: 60,
@@ -160,7 +160,7 @@ class _RadialActionMenuState extends State<RadialActionMenu>
         item.onTap();
       },
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+        settings: GlassConfig.settingsForPreset(context),
         child: Container(
           width: 60,
           height: 60,

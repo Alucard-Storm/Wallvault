@@ -132,16 +132,9 @@ class _SplashScreenState extends State<SplashScreen>
             // Glass container with text
             Center(
               child: LiquidGlassLayer(
-                settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 15)),
+                settings: GlassConfig.settingsForPreset(context),
                 child: LiquidGlass(
-                  appearance: GlassConfig.resolveAppearance(
-                    context,
-                    LiquidGlassAppearance(
-                      tint: isDark
-                          ? const Color(0x33FFFFFF)
-                          : const Color(0x33000000),
-                    ),
-                  ),
+                  appearance: GlassConfig.appearanceForPreset(context),
                   shape: const LiquidRoundedSuperellipse(borderRadius: 32),
                   child: Container(
                     padding: const EdgeInsets.symmetric(

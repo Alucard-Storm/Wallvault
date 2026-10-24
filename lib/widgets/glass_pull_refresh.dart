@@ -62,7 +62,7 @@ class _GlassRefreshIndicatorState extends State<GlassRefreshIndicator>
     final isRefreshing = widget.progress >= 1.0;
 
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+      settings: GlassConfig.settingsForPreset(context),
       child: Container(
         width: 60,
         height: 60,

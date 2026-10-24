@@ -520,22 +520,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                   }
 
                                   return LiquidGlassLayer(
-                                    settings: GlassConfig.resolve(
-                                      context,
-                                      const LiquidGlassSettings(frost: 12),
-                                    ),
+                                    settings: GlassConfig.settingsForPreset(context),
                                     child: LiquidStretch(
                                       child: LiquidGlass(
-                                        appearance: GlassConfig.resolveAppearance(
-                                          context,
-                                          LiquidGlassAppearance(
-                                            tint:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? const Color(0x66000000)
-                                                : const Color(0x66FFFFFF),
-                                          ),
-                                        ),
+                                        appearance: GlassConfig.appearanceForPreset(context),
                                         shape: const LiquidRoundedSuperellipse(
                                           borderRadius: 24,
                                         ),
@@ -589,10 +577,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             // Set Wallpaper button
                             Expanded(
                               child: LiquidGlassLayer(
-                                settings: GlassConfig.resolve(
-                                  context,
-                                  const LiquidGlassSettings(frost: 12),
-                                ),
+                                settings: GlassConfig.settingsForPreset(context),
                                 child: LiquidStretch(
                                   child: LiquidGlass(
                                     appearance: GlassConfig.resolveAppearance(
@@ -667,20 +652,9 @@ class _DetailScreenState extends State<DetailScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: LiquidGlassLayer(
-                        settings: GlassConfig.resolve(
-                          context,
-                          const LiquidGlassSettings(frost: 15),
-                        ),
+                        settings: GlassConfig.settingsForPreset(context),
                         child: LiquidGlass(
-                          appearance: GlassConfig.resolveAppearance(
-                            context,
-                            LiquidGlassAppearance(
-                              tint:
-                                  Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0x55000000)
-                                  : const Color(0x55FFFFFF),
-                            ),
-                          ),
+                          appearance: GlassConfig.appearanceForPreset(context),
                           shape: const LiquidRoundedSuperellipse(
                             borderRadius: 24,
                           ),

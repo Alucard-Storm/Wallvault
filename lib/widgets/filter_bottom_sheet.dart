@@ -60,16 +60,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
-      settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 8)),
+      settings: GlassConfig.settingsForPreset(context),
       child: LiquidGlass(
-        appearance: GlassConfig.resolveAppearance(
-          context,
-          LiquidGlassAppearance(
-            tint: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0x33000000)
-                : const Color(0x33FFFFFF),
-          ),
-        ),
+        appearance: GlassConfig.appearanceForPreset(context),
         shape: const LiquidRoundedSuperellipse(borderRadius: 20),
         child: Container(
           padding: const EdgeInsets.all(20),
@@ -305,7 +298,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
                 // Apply button
                 LiquidGlassLayer(
-                  settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 8)),
+                  settings: GlassConfig.settingsForPreset(context),
                   child: LiquidGlass(
                     appearance: GlassConfig.resolveAppearance(
                       context,

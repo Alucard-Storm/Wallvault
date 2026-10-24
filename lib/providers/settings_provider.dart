@@ -23,6 +23,11 @@ class SettingsProvider with ChangeNotifier {
   bool get useSystemColors => _useSystemColors;
   bool get reduceTransparency => _reduceTransparency;
   bool get isLoaded => _isLoaded;
+  // Glass settings
+  String get glassPreset => _glassPreset;
+  double get glassTintAmount => _glassTintAmount;
+  String _glassPreset = 'regular';
+  double _glassTintAmount = 0.35;
 
   // Get current theme colors
   Color get primaryColor =>
@@ -53,6 +58,14 @@ class SettingsProvider with ChangeNotifier {
           : 'indigo';
       _useSystemColors = prefs.getBool('useSystemColors') ?? true;
       _reduceTransparency = prefs.getBool('reduceTransparency') ?? false;
+      // Glass settings
+      _glassPreset = prefs.getString('glassPreset') ?? 'regular';
+      _glassTintAmount = prefs.getDouble('glassTintAmount') ?? 0.35;
+
+      if (!['regular', 'clear', 'frosted', 'smoked']
+          .contains(_glassPreset)) {
+        _glassPreset = 'regular';
+      }
 
       _isLoaded = true;
       notifyListeners();
@@ -139,6 +152,28 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Set glass preset
+  Future<void> setGlassPreset(String preset) async {
+  const allowed = ['regular', 'clear', 'frosted', 'smoked'];
+  if (!allowed.contains(preset)) return;
+
+  _glassPreset = preset;
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('glassPreset', preset);
+
+  notifyListeners();
+  }
+
+  Future<void> setGlassTintAmount(double amount) async {
+    _glassTintAmount = amount.clamp(0.0, 1.0);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('glassTintAmount', _glassTintAmount);
+
+    notifyListeners();
+}
+
   // Reset to defaults
   Future<void> resetToDefaults() async {
     _apiKey = null;
@@ -148,6 +183,8 @@ class SettingsProvider with ChangeNotifier {
     _isDarkTheme = true;
     _themeColor = 'indigo';
     _reduceTransparency = false;
+    _glassPreset = 'regular';
+    _glassTintAmount = 0.35;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('apiKey');
@@ -158,6 +195,8 @@ class SettingsProvider with ChangeNotifier {
     await prefs.remove('themeColor');
     await prefs.remove('useSystemColors');
     await prefs.remove('reduceTransparency');
+    await prefs.remove('glassPreset');
+    await prefs.remove('glassTintAmount');
 
     notifyListeners();
   }

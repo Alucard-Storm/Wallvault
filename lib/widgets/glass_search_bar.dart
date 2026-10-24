@@ -26,16 +26,9 @@ class GlassSearchBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 10)),
+        settings: GlassConfig.settingsForPreset(context),
         child: LiquidGlass(
-          appearance: GlassConfig.resolveAppearance(
-            context,
-            LiquidGlassAppearance(
-              tint: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x55000000)
-                  : const Color(0x55FFFFFF),
-            ),
-          ),
+          appearance: GlassConfig.appearanceForPreset(context),
           shape: const LiquidRoundedSuperellipse(borderRadius: 24),
           child: Container(
             height: 56,

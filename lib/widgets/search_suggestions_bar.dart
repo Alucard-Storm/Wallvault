@@ -98,7 +98,7 @@ class _SuggestionChipState extends State<_SuggestionChip> {
         duration: AnimationConfig.fast,
         curve: AnimationConfig.defaultCurve,
         child: LiquidGlassLayer(
-          settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+          settings: GlassConfig.settingsForPreset(context),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(

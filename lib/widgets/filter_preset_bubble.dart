@@ -49,7 +49,7 @@ class _FilterPresetBubbleState extends State<FilterPresetBubble> {
         duration: AnimationConfig.fast,
         curve: AnimationConfig.defaultCurve,
         child: LiquidGlassLayer(
-          settings: GlassConfig.resolve(context, const LiquidGlassSettings()),
+          settings: GlassConfig.settingsForPreset(context),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(

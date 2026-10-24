@@ -37,7 +37,7 @@ class FloatingGlassNavBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 12)),
+        settings: GlassConfig.settingsForPreset(context),
         child: LiquidGlassBlendGroup(
           blend: 5,
           child: LoupeTabBar(
@@ -48,14 +48,7 @@ class FloatingGlassNavBar extends StatelessWidget {
             selectedIndex: selectedIndex,
             onSelected: onDestinationSelected,
             shadows: _shadows,
-            appearance: GlassConfig.resolveAppearance(
-              context,
-              LiquidGlassAppearance(
-                tint: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0x66000000)
-                    : const Color(0x66FFFFFF),
-              ),
-            ),
+            appearance: GlassConfig.appearanceForPreset(context),
           ),
         ),
       ),
@@ -95,16 +88,9 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 10)),
+        settings: GlassConfig.settingsForPreset(context),
         child: LiquidGlass(
-          appearance: GlassConfig.resolveAppearance(
-            context,
-            LiquidGlassAppearance(
-              tint: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x44000000)
-                  : const Color(0x44FFFFFF),
-            ),
-          ),
+          appearance: GlassConfig.appearanceForPreset(context),
           shape: const LiquidRoundedSuperellipse(borderRadius: 1),
           child: AppBar(
             title: Column(

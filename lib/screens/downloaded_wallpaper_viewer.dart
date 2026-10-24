@@ -207,19 +207,9 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
                   child: LiquidGlassLayer(
-                    settings: GlassConfig.resolve(
-                      context,
-                      const LiquidGlassSettings(frost: 15),
-                    ),
+                    settings: GlassConfig.settingsForPreset(context),
                     child: LiquidGlass(
-                      appearance: GlassConfig.resolveAppearance(
-                        context,
-                        LiquidGlassAppearance(
-                          tint: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0x55000000)
-                              : const Color(0x55FFFFFF),
-                        ),
-                      ),
+                      appearance: GlassConfig.appearanceForPreset(context),
                       shape: const LiquidRoundedSuperellipse(borderRadius: 24),
                       child: Container(
                         width: double.infinity,
@@ -244,10 +234,7 @@ class DownloadedWallpaperViewer extends StatelessWidget {
                             SizedBox(
                               width: double.infinity,
                               child: LiquidGlassLayer(
-                                settings: GlassConfig.resolve(
-                                  context,
-                                  const LiquidGlassSettings(frost: 12),
-                                ),
+                                settings: GlassConfig.settingsForPreset(context),
                                 child: LiquidGlass(
                                   appearance: GlassConfig.resolveAppearance(
                                     context,

@@ -13,16 +13,9 @@ class GlassLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: LiquidGlassLayer(
-        settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 12)),
+        settings: GlassConfig.settingsForPreset(context),
         child: LiquidGlass(
-          appearance: GlassConfig.resolveAppearance(
-            context,
-            LiquidGlassAppearance(
-              tint: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x66000000)
-                  : const Color(0x66FFFFFF),
-            ),
-          ),
+          appearance: GlassConfig.appearanceForPreset(context),
           shape: const LiquidRoundedSuperellipse(borderRadius: 20),
           child: Container(
             padding: const EdgeInsets.all(24),
@@ -86,16 +79,9 @@ class GlassEmptyState extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: LiquidGlassLayer(
-          settings: GlassConfig.resolve(context, const LiquidGlassSettings(frost: 10)),
+          settings: GlassConfig.settingsForPreset(context),
           child: LiquidGlass(
-            appearance: GlassConfig.resolveAppearance(
-              context,
-              LiquidGlassAppearance(
-                tint: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0x44000000)
-                    : const Color(0x44FFFFFF),
-              ),
-            ),
+            appearance: GlassConfig.appearanceForPreset(context),
             shape: const LiquidRoundedSuperellipse(borderRadius: 24),
             child: Container(
               padding: const EdgeInsets.all(32),

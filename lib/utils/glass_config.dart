@@ -80,12 +80,56 @@ class GlassConfig {
     );
   }
 
-  /// Default border radius for glass shapes
-  static const double defaultRadius = 24.0;
+   /// Default border radius for glass shapes
+    static const double defaultRadius = 24.0;
 
-  /// Small border radius
-  static const double smallRadius = 12.0;
+    /// Small border radius
+    static const double smallRadius = 12.0;
 
-  /// Large border radius
-  static const double largeRadius = 32.0;
+    /// Large border radius
+    static const double largeRadius = 32.0;
+
+    static LiquidGlassSettings settingsForPreset(
+    BuildContext context,
+  ) {
+    final provider = context.watch<SettingsProvider>();
+    final brightness = Theme.of(context).brightness;
+    final tintAmount = provider.glassTintAmount;
+
+    final settings = switch (provider.glassPreset) {
+      'clear' => LiquidGlassSettings.ios27Clear(
+        tintAmount: tintAmount,
+      ),
+      'frosted' => LiquidGlassSettings.ios27Regular(
+        brightness: brightness,
+        tintAmount: 1.0,
+      ),
+      'smoked' => LiquidGlassSettings.ios27Regular(
+        brightness: brightness,
+        tintAmount: 0.75,
+      ),
+      _ => LiquidGlassSettings.ios27Regular(
+        brightness: brightness,
+        tintAmount: tintAmount,
+      ),
+    };
+
+    return resolve(context, settings);
+  }
+
+  static LiquidGlassAppearance appearanceForPreset(
+    BuildContext context,
+  ) {
+    final provider = context.watch<SettingsProvider>();
+    final brightness = Theme.of(context).brightness;
+
+    final appearance = switch (provider.glassPreset) {
+      'clear' => LiquidGlassAppearance.ios27Clear(),
+      _ => LiquidGlassAppearance.ios27Regular(
+        brightness: brightness,
+      ),
+    };
+
+    return resolveAppearance(context, appearance);
+  }
 }

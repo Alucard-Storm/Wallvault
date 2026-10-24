@@ -465,6 +465,47 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ),
                   const SizedBox(height: 24),
 
+                  // Glass Settings Section
+                  GlassSettingsCard(
+                    title: 'Glass Settings',
+                    children: [
+                    SegmentedButton<String>(
+                      showSelectedIcon: false,
+                      style: const ButtonStyle(
+                        visualDensity: VisualDensity.compact,
+                        padding: WidgetStatePropertyAll(
+                          EdgeInsets.symmetric(horizontal: 4),
+                        ),
+                        textStyle: WidgetStatePropertyAll(
+                          TextStyle(fontSize: 13),
+                        ),
+                      ),
+                      segments: const [
+                        ButtonSegment(value: 'regular', label: Text('Regular')),
+                        ButtonSegment(value: 'clear', label: Text('Clear')),
+                        ButtonSegment(value: 'frosted', label: Text('Frosted')),
+                        ButtonSegment(value: 'smoked', label: Text('Smoked')),
+                      ],
+                      selected: {settings.glassPreset},
+                      onSelectionChanged: (selection) {
+                        settings.setGlassPreset(selection.first);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Glass Tint'),
+                      subtitle: Slider(
+                        value: settings.glassTintAmount,
+                        min: 0,
+                        max: 1,
+                        divisions: 20,
+                        label: '${(settings.glassTintAmount * 100).round()}%',
+                        onChanged: settings.setGlassTintAmount,
+                      ),
+                    )
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
                   // Storage & Cache Section
                   GlassSettingsCard(
                     title: 'Storage & Cache',
