@@ -4,7 +4,9 @@ import '../services/wallhaven_api.dart';
 import '../utils/constants.dart';
 
 class WallpaperProvider with ChangeNotifier {
-  final WallhavenApi _api = WallhavenApi();
+  WallpaperProvider({WallhavenApi? api}) : _api = api ?? WallhavenApi();
+
+  final WallhavenApi _api;
 
   List<Wallpaper> _wallpapers = [];
   bool _isLoading = false;

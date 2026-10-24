@@ -47,7 +47,6 @@ dependencies:
   
   # Storage and file management
   path_provider: ^2.1.2
-  permission_handler: ^13.0.2
   shared_preferences: ^2.2.2
   
   
@@ -63,9 +62,6 @@ dependencies:
   
   # Material You dynamic colors
   dynamic_color: ^1.9.0
-  
-  # Download notifications
-  flutter_local_notifications: ^22.3.1
   
   # Shimmer loading
   shimmer: ^4.0.0
@@ -84,19 +80,12 @@ dependencies:
   
   # Lottie animations
   lottie: ^3.1.0
-  
-  # Device info for Android version
-  device_info_plus: ^13.3.0
-  
+
   # Liquid glass UI effects
   liquid_glass_renderer: ^0.2.0-dev.4
-  
+
   # Advanced animations and interactions
-  carousel_slider: ^5.0.0
   fl_chart: ^1.2.0
-  confetti: ^0.8.0
-  animations: ^3.0.0
-  page_view_dot_indicator: ^2.3.0
 
 dev_dependencies:
   flutter_test:

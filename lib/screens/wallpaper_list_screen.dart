@@ -13,14 +13,33 @@ import 'search_screen.dart';
 import '../utils/constants.dart';
 import '../utils/responsive_utils.dart';
 
-class RandomWallpapersScreen extends StatefulWidget {
-  const RandomWallpapersScreen({super.key});
+/// A wallpaper feed screen for a fixed sort order (top, latest, random, ...).
+///
+/// [lockSortingAndOrder] matches each screen's original behavior: Top lets
+/// the filter sheet override sorting/order freely, while Latest and Random
+/// always re-apply [fixedSorting]/[fixedOrder] regardless of what the filter
+/// sheet returns.
+class WallpaperListScreen extends StatefulWidget {
+  final String title;
+  final String fixedSorting;
+  final String fixedOrder;
+  final bool lockSortingAndOrder;
+  final bool showRefreshButton;
+
+  const WallpaperListScreen({
+    super.key,
+    required this.title,
+    required this.fixedSorting,
+    this.fixedOrder = AppConstants.orderDesc,
+    this.lockSortingAndOrder = true,
+    this.showRefreshButton = false,
+  });
 
   @override
-  State<RandomWallpapersScreen> createState() => _RandomWallpapersScreenState();
+  State<WallpaperListScreen> createState() => _WallpaperListScreenState();
 }
 
-class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
+class _WallpaperListScreenState extends State<WallpaperListScreen>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   late WallpaperProvider _provider;
@@ -40,11 +59,11 @@ class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
       await settings.loadSettings();
       if (!mounted) return;
       _provider.setApiKey(settings.apiKey, refresh: false);
-      // Use settings defaults for categories/purity but keep random sorting
+      // Use settings defaults for categories/purity but keep this screen's sorting
       _provider.updateFilters(
         categories: settings.defaultCategories,
         purity: settings.defaultPurity,
-        sorting: AppConstants.sortRandom,
+        sorting: widget.fixedSorting,
       );
     });
   }
@@ -84,12 +103,11 @@ class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
         currentRatios: _provider.ratios,
         apiKey: settings.apiKey,
         onApply: (categories, purity, sorting, order, ratios) {
-          // Keep sorting as random, only update categories and purity
           _provider.updateFilters(
             categories: categories,
             purity: purity,
-            sorting: AppConstants.sortRandom,
-            order: AppConstants.orderDesc,
+            sorting: widget.lockSortingAndOrder ? widget.fixedSorting : sorting,
+            order: widget.lockSortingAndOrder ? widget.fixedOrder : order,
             ratios: ratios,
           );
         },
@@ -104,13 +122,14 @@ class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GlassAppBar(
-        screenName: 'Random Wallpapers',
+        screenName: widget.title,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: _onRefresh,
-          ),
+          if (widget.showRefreshButton)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh',
+              onPressed: _onRefresh,
+            ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
@@ -130,7 +149,7 @@ class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
         children: [
           // Animated parallax floating background
           const Positioned.fill(child: ParallaxFloatingBackground()),
-          // Random wallpapers content
+          // Wallpaper feed content
           ListenableBuilder(
             listenable: _provider,
             builder: (context, child) {
@@ -160,7 +179,7 @@ class _RandomWallpapersScreenState extends State<RandomWallpapersScreen>
                     left: 8,
                     right: 8,
                     top: 8 + MediaQuery.of(context).padding.top,
-                    bottom: 100,
+                    bottom: 100, // Extra padding for floating nav bar
                   ),
                   itemCount:
                       _provider.wallpapers.length + (_provider.hasMore ? 1 : 0),

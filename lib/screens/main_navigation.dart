@@ -4,9 +4,8 @@ import '../providers/favorites_provider.dart';
 import '../providers/downloads_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/glass_nav_bar.dart';
-import 'top_wallpapers_screen.dart';
-import 'latest_wallpapers_screen.dart';
-import 'random_wallpapers_screen.dart';
+import '../utils/constants.dart';
+import 'wallpaper_list_screen.dart';
 import 'downloads_screen.dart';
 import 'settings_screen.dart';
 
@@ -30,9 +29,20 @@ class _MainNavigationState extends State<MainNavigation> {
     _pageController = PageController(initialPage: _currentIndex);
 
     _screens = [
-      const TopWallpapersScreen(),
-      const LatestWallpapersScreen(),
-      const RandomWallpapersScreen(),
+      const WallpaperListScreen(
+        title: 'Top Wallpapers',
+        fixedSorting: AppConstants.sortToplist,
+        lockSortingAndOrder: false,
+      ),
+      const WallpaperListScreen(
+        title: 'Latest Wallpapers',
+        fixedSorting: AppConstants.sortDateAdded,
+      ),
+      const WallpaperListScreen(
+        title: 'Random Wallpapers',
+        fixedSorting: AppConstants.sortRandom,
+        showRefreshButton: true,
+      ),
       DownloadsScreen(
         onBrowse: () {
           if (mounted) {

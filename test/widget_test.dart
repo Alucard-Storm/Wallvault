@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:wallvault/screens/favorites_screen.dart';
 import 'package:wallvault/providers/favorites_provider.dart';
+import 'package:wallvault/providers/settings_provider.dart';
 
 void main() {
   testWidgets('FavoritesScreen smoke test', (WidgetTester tester) async {
@@ -17,6 +18,8 @@ void main() {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+          // GlassAppBar reads SettingsProvider (reduce-transparency setting).
+          ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ],
         child: const MaterialApp(
           home: FavoritesScreen(),

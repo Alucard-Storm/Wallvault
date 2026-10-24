@@ -4,8 +4,7 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <!-- Storage permissions not needed on API 32+ (minSdk is 32) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    
+
     <application
         android:label="wallvault"
         android:name="${applicationName}"
